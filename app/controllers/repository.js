@@ -8,12 +8,9 @@ module.exports.createRepository = (req, res) => {
   if (req.JWTData) {
     let userName = req.JWTData.userName;
     var repositoryName = req.body.repositoryName;
-
     try {
-
       fs.mkdirSync(rootDirectory + userName + '/' + repositoryName)
       var repoPath = rootDirectory + userName + '/' + repositoryName
-
       execute('git init --bare ' + repoPath, (result) => {
         res.json(result.trim())
         fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
@@ -21,7 +18,6 @@ module.exports.createRepository = (req, res) => {
         exec('chmod +x ' + repoPath + '/hooks/post-receive', (error, stdout, stderr) => {
           console.log('Created post-receive hook');
         })
-
         let repositoryData = {
           repositoryName: repositoryName,
           userName: userName,
@@ -77,8 +73,6 @@ module.exports.deleteRepository = (req, res) => {
       }
 
     })
-
-
   }
   else {
     res.status(403).json("invalid Credentials")
@@ -99,11 +93,9 @@ module.exports.getAllRepositories = (req ,res) => {
 }
 var execute = (command, callback) => {
   exec(command, (error, stdout, stderr) => {
-
     console.log("Error", error);
     console.log("Std err", stderr);
     console.log("Stdout", stdout);
-
     callback(stdout);
   });
 };

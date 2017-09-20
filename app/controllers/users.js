@@ -2,16 +2,12 @@ const fs = require('fs')
 import { rootDirectory } from '../helper/constant'
 
 module.exports.viewAllUsers = (req, res) => {
-
     req.query.search = req.query.search ? req.query.search : '';
     req.query.limit = req.query.limit ? parseInt(req.query.limit, null) : 100;
     req.query.sort = req.query.sort ? req.query.sort : '_id';
     req.query.page = req.query.page ? parseInt(req.query.page) : 1;
-
     var filters = {};
-
     var keys = "firstName email lastName permissions";
-
     req.app.db.models.User.pagedFind({
         filters: filters,
         keys: keys,
@@ -27,10 +23,7 @@ module.exports.viewAllUsers = (req, res) => {
         res.json(results);
     });
 };
-
-
 module.exports.viewUser = (req, res) => {
-
     req.app.db.models.User.findById(req.params.id, function (err, user) {
         if (err) {
             console.log("Error", err);
@@ -41,18 +34,17 @@ module.exports.viewUser = (req, res) => {
     });
 };
 
-
 module.exports.deleteUser = (req, res) => {
 
-    req.app.db.models.User.findByIdAndRemove(req.params.id, function (err, user) {
-        if (err) {
-            console.log("Error", err);
-            res.json({ message: "error" });
-            return
-        }
-        res.json({ "message": "success" });
+req.app.db.models.User.findByIdAndRemove(req.params.id, function (err, user) {
+    if (err) {
+        console.log("Error", err);
+        res.json({ message: "error" });
+        return
+    }
+    res.json({ "message": "success" });
 
-    });
+});
 };
 
 
@@ -62,9 +54,8 @@ module.exports.addUser = (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         password: req.body.password,
-        userName : req.body.userName,
+        userName: req.body.userName,
         email: req.body.email,
-    
     };
     if (!req.body.password || !req.body.email) {
         res.json({ "message": "error" });
@@ -90,7 +81,7 @@ module.exports.addUser = (req, res) => {
                 res.json(err);
                 return
             }
-            console.log("dir" , rootDirectory + data.userName )
+            console.log("dir", rootDirectory + data.userName)
             fs.mkdirSync(rootDirectory + data.userName)
             res.json(data);
         })
