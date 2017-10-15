@@ -79,17 +79,19 @@ module.exports.deleteRepository = (req, res) => {
   }
 }
 
-module.exports.getAllRepositories = (req ,res) => {
-
-  req.app.db.models.Repository.find({}, (err, result) => {
-    if (err) {
-      console.log("Error", err);
-      return;
-    }
-    console.log(result);
-    res.json(result);
-  })
-
+module.exports.getAllRepositories = (req, res) => {
+  if(req.JWTData){
+    req.app.db.models.Repository.find({"userName" : req.JWTData.userName}, (err, result) => {
+      if (err) {
+        console.log("Error", err);
+        return;
+      }
+      console.log('results',result)
+      res.json(result);
+    })
+  }else{
+    res.status(403).json("invalid Credentials")
+  }
 }
 var execute = (command, callback) => {
   exec(command, (error, stdout, stderr) => {

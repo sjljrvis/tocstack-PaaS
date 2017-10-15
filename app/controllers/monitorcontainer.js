@@ -2,7 +2,7 @@ var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req , res) =>{
    let containerName = req.query.containerName ;
-   execute('docker inspect sejal_dockertest_mammoth-baseball' , (result) =>{
+   execute('docker inspect sejal_testingapp_stunning-wing' , (result) =>{
     result = JSON.parse(result);
     res.json(result);
 

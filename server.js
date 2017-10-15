@@ -32,8 +32,6 @@ global.__base = __dirname ;
 
 var request = require('request');
 var token = "38936697bd54da1c86dbf68e737f49cd60492d5a8c31d7ce4b6b76bce1450b06";
-
-
 //app.use('*', require('./middleware/decodeJWT').decodeToken);
 
 app.db = mongoose.createConnection(config.mongodb.uri);
@@ -46,14 +44,6 @@ import {models} from './models';
 models(app, mongoose);
 import {indexRoute} from './app/routes';
 indexRoute(app);
-
-app.get('/auth/userDetails', function (req, res) {
-    res.json({ message: "success" });
-});
-app.get('/auth/user', function (req, res) {
-    res.json({ message: "success" });
-});
-
 app.listen(port , () =>{
 console.log('server running on :'+ port)
 })
