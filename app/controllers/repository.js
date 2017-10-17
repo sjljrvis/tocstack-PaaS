@@ -86,7 +86,6 @@ module.exports.getAllRepositories = (req, res) => {
         console.log("Error", err);
         return;
       }
-      console.log('results',result)
       res.json(result);
     })
   }else{
