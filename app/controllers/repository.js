@@ -85,13 +85,14 @@ module.exports.deleteRepository = (req, res) => {
 }
 
 module.exports.getAllRepositories = (req, res) => {
+	console.log(req.JWTData);
 	if (req.JWTData) {
 		req.app.db.models.Repository.find({ "userName": req.JWTData.userName }, (err, result) => {
 			if (err) {
 				console.log("Error", err);
 				return;
 			}
-			res.json(result);
+			res.status(200).json(result);
 		})
 	} else {
 		res.status(403).json("invalid Credentials")

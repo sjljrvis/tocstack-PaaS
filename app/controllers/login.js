@@ -1,6 +1,5 @@
 // Login page
 module.exports.loginPage = function (req, res, next) {
-
 	req.app.db.models.User.findOne({
 		email: req.body.email
 	}, function (err, user) {
