@@ -4,7 +4,15 @@ module.exports.monitorContainer = (req, res) => {
   let containerName = req.query.containerName;
   execute('docker inspect sejal_testingapp_stunning-wing', (result) => {
     result = JSON.parse(result);
-    res.json(result);
+    res.status(200).json(result);
+  })
+}
+
+module.exports.executeCommand = (req, res) => {
+  let containerName = req.query.containerName;
+  let command = req.body.command
+  execute('docker run sejal_testingapp_stunning-wing'+" "+command, (result) => {
+    res.status(200).send(result);
   })
 
 }
