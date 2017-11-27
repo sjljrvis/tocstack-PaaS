@@ -1,2 +1,3 @@
 
-export const rootDirectory = '/home/sejal/PaaS/' ; ///home/sejal/Desktop/
+import {rootDirectory} from '../../config'
+export const rootDirectory = rootDirectory
