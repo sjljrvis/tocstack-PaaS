@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "script": "/root/PaaS",
   "exec_interpreter" : "babel-node",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
