@@ -1,3 +1,3 @@
 
-import {rootDirectory} from '../../config'
-export const rootDirectory = rootDirectory
+import {serverRootDirectory} from '../../config'
+export const rootDirectory = serverRootDirectory
