@@ -1,5 +1,6 @@
 const fs = require('fs')
 var exec = require('child_process').exec;
+import md5 from 'apache-md5'
 import { rootDirectory } from '../helper/constant'
 
 module.exports.viewAllUsers = (req, res) => {
@@ -44,7 +45,7 @@ module.exports.deleteUser = (req, res) => {
 			res.json({ status: "false", message: "error" });
 			return
 		}
-		exec(`rm -rf ${rootDirectory+user.userName}`, (error, stdout, stderr) => {
+		exec(`rm -rf ${rootDirectory + user.userName}`, (error, stdout, stderr) => {
 			console.log(`rm -rf ${rootDirectory}+${user.userName}`);
 			if (error !== null) {
 				res.json({ status: "false", message: "error" });
@@ -99,7 +100,15 @@ module.exports.addUser = (req, res) => {
 				}
 				console.log("dir", rootDirectory + data.userName)
 				fs.mkdirSync(rootDirectory + data.userName)
-				res.json({ status: "true", message: "Register successful" });
+				let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
+				fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
+					if (err) {
+						return;
+					} else {
+						res.json({ status: "true", message: "Register successful" });
+					}
+				})
+
 			})
 		});
 };

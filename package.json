@@ -4,16 +4,17 @@
   "description": "",
   "main": "index.js",
   "script": "/root/PaaS",
-  "exec_interpreter" : "babel-node",
+  "exec_interpreter": "babel-node",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "dev": "nodemon index.js --exec babel-node --presets es2015,stage-2",
     "start": "nodemon index.js --exec babel-node --presets es2015,stage-2"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "amqplib": "^0.5.1",
+    "apache-md5": "^1.1.2",
     "babel": "^6.23.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
