@@ -102,7 +102,7 @@ module.exports.addUser = (req, res) => {
 						return;
 					}
 					else {
-						let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
+						let passwordData = `${req.body.userName}:${md5(req.body.password)}`
 						fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
 							if (err) {
 								return;
