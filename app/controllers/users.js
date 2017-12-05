@@ -2,6 +2,7 @@ const fs = require('fs')
 var exec = require('child_process').exec;
 import md5 from 'apache-md5'
 import { rootDirectory } from '../helper/constant'
+import { execshell } from '../helper/functions'
 
 module.exports.viewAllUsers = (req, res) => {
 	req.query.search = req.query.search ? req.query.search : '';
@@ -37,22 +38,22 @@ module.exports.viewUser = (req, res) => {
 	});
 };
 
-module.exports.deleteUser = (req, res) => {
 
+module.exports.deleteUser = (req, res) => {
 	req.app.db.models.User.findOneAndRemove({ userName: req.params.userName }, function (err, user) {
 		if (err) {
 			console.log("Error", err);
-			res.json({ status: "false", message: "error" });
+			res.status(200).json({ status: "false", message: "error" });
 			return
 		}
 		exec(`rm -rf ${rootDirectory + user.userName}`, (error, stdout, stderr) => {
 			console.log(`rm -rf ${rootDirectory}+${user.userName}`);
 			if (error !== null) {
-				res.json({ status: "false", message: "error" });
+				res.status(200).json({ status: "false", message: "error" });
 				return;
 			}
 			else {
-				res.json({ status: "true", "message": "success" });
+				res.status(200).json({ status: "true", "message": "success" });
 			}
 		})
 	});
@@ -98,17 +99,16 @@ module.exports.addUser = (req, res) => {
 					res.json(err);
 					return
 				}
-				console.log("dir", rootDirectory + data.userName)
-				fs.mkdirSync(rootDirectory + data.userName)
-				let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
-				fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
-					if (err) {
-						return;
-					} else {
-						res.json({ status: "true", message: "Register successful" });
-					}
+				execshell(`sudo -u www-data mkdir ${rootDirectory + data.userName} && chown www-data:www-data -R ${rootDirectory + data.userName}`, (err, stdout) => {
+					let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
+					fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
+						if (err) {
+							return;
+						} else {
+							res.json({ status: "true", message: "Register successful" });
+						}
+					})
 				})
-
 			})
 		});
 };
@@ -124,7 +124,6 @@ module.exports.editUser = (req, res) => {
 	};
 	if (req.body.password) {
 		var SALT_FACTOR = 5;
-
 		req.app.bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
 			if (err) {
 				res.json({ "message": "error" });
