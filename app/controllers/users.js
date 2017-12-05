@@ -61,7 +61,6 @@ module.exports.deleteUser = (req, res) => {
 
 
 module.exports.addUser = (req, res) => {
-
 	var user = {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
@@ -93,21 +92,33 @@ module.exports.addUser = (req, res) => {
 				return
 			}
 			req.app.db.models.User.create(user, (err, data) => {
-
 				if (err) {
 					console.log("Error", err);
 					res.json(err);
 					return
 				}
 				execshell(`sudo -u www-data mkdir ${rootDirectory + data.userName} && chown www-data:www-data -R ${rootDirectory + data.userName}`, (err, stdout) => {
-					let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
-					fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
-						if (err) {
-							return;
-						} else {
-							res.json({ status: "true", message: "Register successful" });
-						}
-					})
+					if (err) {
+						return;
+					}
+					else {
+						let passwordData = `${req.body.userName} : ${md5(req.body.password)}`
+						fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
+							if (err) {
+								return;
+							}
+							else {
+								execshell(`sudo -u www-data mkdir ${rootDirectory + data.userName} && chown www-data:www-data -R ${rootDirectory + data.userName}`, (err, stdout) => {
+									if (err) {
+										return;
+									}
+									else {
+										res.json({ status: "true", message: "Register successful" });
+									}
+								})
+							}
+						})
+					}
 				})
 			})
 		});
