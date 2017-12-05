@@ -108,7 +108,7 @@ module.exports.addUser = (req, res) => {
 								return;
 							}
 							else {
-								execshell(`sudo service nginx relo`, (err, stdout) => {
+								execshell(`sudo service nginx reload`, (err, stdout) => {
 									if (err) {
 										return;
 									}
