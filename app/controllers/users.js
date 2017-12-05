@@ -108,7 +108,7 @@ module.exports.addUser = (req, res) => {
 								return;
 							}
 							else {
-								execshell(`sudo -u www-data mkdir ${rootDirectory + data.userName} && chown www-data:www-data -R ${rootDirectory + data.userName}`, (err, stdout) => {
+								execshell(`sudo service nginx relo`, (err, stdout) => {
 									if (err) {
 										return;
 									}
