@@ -13,7 +13,7 @@ module.exports.createRepository = (req, res) => {
 		try {
 
 			execshell(`sudo -u www-data mkdir ${rootDirectory + userName + '/' + repositoryName}
-								 && chown www-data:www-data -R ${rootDirectory + data.userName}
+								 && chown www-data:www-data -R ${rootDirectory + userName}
 								 && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName}`,
 				(err, stdout) => {
 					if (err) {
