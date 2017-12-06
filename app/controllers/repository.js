@@ -18,7 +18,6 @@ module.exports.createRepository = (req, res) => {
 						return;
 					}
 					else {
-						fs.mkdirSync(rootDirectory + userName + '/' + repositoryName)
 						var repoPath = rootDirectory + userName + '/' + repositoryName
 						execute('git init --bare ' + repoPath, (result) => {
 							//fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
