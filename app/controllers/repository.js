@@ -12,7 +12,7 @@ module.exports.createRepository = (req, res) => {
 
 		try {
 
-			execshell(`cd && cd ${rootDirectory + userName } && sudo -u www-data mkdir ${repositoryName} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName}`,
+			execshell(`cd && cd ${rootDirectory + userName } && sudo -u www-data mkdir ${repositoryName}`,
 				(err, stdout) => {
 					if (err) {
 						return;
@@ -23,7 +23,7 @@ module.exports.createRepository = (req, res) => {
 							//fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
 							//fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
 							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
-							exec(`sudo service nginx reload`, (error, stdout, stderr) => {
+							exec(`chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
 								let repositoryData = {
 									repositoryName: repositoryName,
 									userName: userName,
