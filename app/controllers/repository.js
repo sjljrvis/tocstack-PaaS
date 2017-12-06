@@ -1,6 +1,6 @@
 const fs = require('fs')
 var exec = require('child_process').exec;
-
+import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
 
 module.exports.createRepository = (req, res) => {
@@ -11,35 +11,42 @@ module.exports.createRepository = (req, res) => {
 		var language = req.body.language;
 
 		try {
-			fs.mkdirSync(rootDirectory + userName + '/' + repositoryName)
-			var repoPath = rootDirectory + userName + '/' + repositoryName
-			execute('git init --bare ' + repoPath, (result) => {
-				//res.json(result.trim())
-				fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
-				fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
-				exec('chmod +x ' + repoPath + '/hooks/post-receive', (error, stdout, stderr) => {
-					console.log('Created post-receive hook');
-				})
-				let repositoryData = {
-					repositoryName: repositoryName,
-					userName: userName,
-					path: repoPath,
-					pathDocker: repoPath + '_docker',
-					language: language
-				}
-				req.app.db.models.Repository.create(repositoryData, (err, result) => {
+
+			execshell(`sudo -u www-data mkdir ${rootDirectory + userName + '/' + repositoryName}
+								 && chown www-data:www-data -R ${rootDirectory + data.userName}
+								 && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName}`,
+				(err, stdout) => {
 					if (err) {
-						console.log("Error", err);
 						return;
 					}
-					console.log('Check1');
-					res.json({ status: 'true', message: 'Repository created successfully' })
+					else {
+						fs.mkdirSync(rootDirectory + userName + '/' + repositoryName)
+						var repoPath = rootDirectory + userName + '/' + repositoryName
+						execute('git init --bare ' + repoPath, (result) => {
+							//fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
+							//fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
+							exec(`ls`/*'chmod +x ' + repoPath + '/hooks/post-receive'*/, (error, stdout, stderr) => {
+							})
+							let repositoryData = {
+								repositoryName: repositoryName,
+								userName: userName,
+								path: repoPath,
+								pathDocker: repoPath + '_docker',
+								language: language
+							}
+							req.app.db.models.Repository.create(repositoryData, (err, result) => {
+								if (err) {
+									console.log("Error", err);
+									return;
+								}
+								res.json({ status: 'true', message: 'Repository created successfully' })
+							})
+						})
+					}
 				})
-			})
-
 		} catch (err) {
 			if (err.code !== 'EEXIST')
-			console.log("Error", err);
+				console.log("Error", err);
 			console.log('Check2');
 			res.json({ status: 'false', message: 'Repository already exists please choose another name' })
 			return;
