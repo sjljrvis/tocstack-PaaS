@@ -25,7 +25,8 @@ module.exports.createRepository = (req, res) => {
 						execute('git init --bare ' + repoPath, (result) => {
 							//fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
 							//fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
-							exec(`ls && sudo service nginx reload`/*'chmod +x ' + repoPath + '/hooks/post-receive'*/, (error, stdout, stderr) => {
+							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
+							exec(`sudo service nginx reload`, (error, stdout, stderr) => {
 							})
 							let repositoryData = {
 								repositoryName: repositoryName,
