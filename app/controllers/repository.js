@@ -12,9 +12,7 @@ module.exports.createRepository = (req, res) => {
 
 		try {
 
-			execshell(`sudo -u www-data mkdir ${rootDirectory + userName + '/' + repositoryName}
-								 && chown www-data:www-data -R ${rootDirectory + userName}
-								 && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName}`,
+			execshell(`sudo -u www-data mkdir ${rootDirectory + userName + '/' + repositoryName} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName}`,
 				(err, stdout) => {
 					if (err) {
 						return;
@@ -27,20 +25,20 @@ module.exports.createRepository = (req, res) => {
 							//fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
 							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
 							exec(`sudo service nginx reload`, (error, stdout, stderr) => {
-							})
-							let repositoryData = {
-								repositoryName: repositoryName,
-								userName: userName,
-								path: repoPath,
-								pathDocker: repoPath + '_docker',
-								language: language
-							}
-							req.app.db.models.Repository.create(repositoryData, (err, result) => {
-								if (err) {
-									console.log("Error", err);
-									return;
+								let repositoryData = {
+									repositoryName: repositoryName,
+									userName: userName,
+									path: repoPath,
+									pathDocker: repoPath + '_docker',
+									language: language
 								}
-								res.json({ status: 'true', message: 'Repository created successfully' })
+								req.app.db.models.Repository.create(repositoryData, (err, result) => {
+									if (err) {
+										console.log("Error", err);
+										return;
+									}
+									res.json({ status: 'true', message: 'Repository created successfully' })
+								})
 							})
 						})
 					}
