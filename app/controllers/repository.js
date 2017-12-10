@@ -2,7 +2,7 @@ const fs = require('fs')
 var exec = require('child_process').exec;
 import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
-
+import { callDockerPath, shellScriptPath } from '../../config'
 module.exports.createRepository = (req, res) => {
 
 	if (req.JWTData) {
@@ -11,8 +11,7 @@ module.exports.createRepository = (req, res) => {
 		var language = req.body.language;
 
 		try {
-
-			execshell(`cd && cd ${rootDirectory + userName } && sudo -u www-data mkdir ${repositoryName}`,
+			execshell(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,
 				(err, stdout) => {
 					if (err) {
 						return;
@@ -20,10 +19,10 @@ module.exports.createRepository = (req, res) => {
 					else {
 						var repoPath = rootDirectory + userName + '/' + repositoryName
 						execute('git init --bare ' + repoPath, (result) => {
-							//fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync('/home/sejal/Desktop/constantJS/calldocker.js'));
-							//fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync('/home/sejal/Desktop/constantJS/post-receive'));
+							fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync(`${callDockerPath}/calldocker.js`));
+							fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
 							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
-							exec(`chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
+							exec(`chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
 								let repositoryData = {
 									repositoryName: repositoryName,
 									userName: userName,
@@ -100,7 +99,7 @@ module.exports.getAllRepositories = (req, res) => {
 			res.status(200).json(result);
 		})
 	} else {
-		res.status(403).json("invalid Credentials")
+		res.status(403).json({ status: false, message: "Session timed out" })
 	}
 }
 var execute = (command, callback) => {
