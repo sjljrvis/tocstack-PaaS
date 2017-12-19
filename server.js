@@ -10,12 +10,12 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 var config = require('./config')
 
-var app = express() ;
+var app = express();
 
 app.use(cors());
 app.use(cookieParser('LOL-my-Secret-dam'));
 app.use(bodyparser.json())
-app.use(bodyparser({urlencoded : true}))
+app.use(bodyparser({ urlencoded: true }))
 
 
 
@@ -24,9 +24,9 @@ var port = config.port
 app.jwt = jwt;
 app.bcrypt = bcrypt;
 app.expressjwt = expressjwt;
-app.config = config ;
+app.config = config;
 
-global.__base = __dirname ;
+global.__base = __dirname;
 
 
 
@@ -40,10 +40,10 @@ app.db.once('open', function () {
     console.log(config.mongodb.uri);
 });
 
-import {models} from './models';
+import { models } from './models';
 models(app, mongoose);
-import {indexRoute} from './app/routes';
+import { indexRoute } from './app/routes';
 indexRoute(app);
-app.listen(port , () =>{
-console.log('server running on :'+ port)
+app.listen(port, () => {
+    console.log('server running on :' + port)
 })
