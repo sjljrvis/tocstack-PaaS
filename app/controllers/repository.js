@@ -6,9 +6,10 @@ import { callDockerPath, shellScriptPath } from '../../config'
 module.exports.createRepository = (req, res) => {
 
 	if (req.JWTData) {
+
 		let userName = req.JWTData.userName;
-		var repositoryName = req.body.repositoryName;
-		var language = req.body.language;
+		let repositoryName = req.body.repositoryName;
+		let language = req.body.language;
 
 		try {
 			execshell(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,
@@ -68,18 +69,11 @@ module.exports.deleteRepository = (req, res) => {
 			}
 			execute('rm -rf ' + repositoryData.path, (result) => {
 				console.log(result)
-				res.json("Deleted")
+				res.json({ status: true, message: "Deleted" })
 			})
-			if (repositoryData.containerName != 'kracken') {
-				execute('docker stop ' + repositoryData.containerName, (result) => {
-					execute('docker rm ' + repositoryData.containerName, (result) => {
-						execute('docker rmi ' + repositoryData.containerName, (result) => {
-							condole.log("Container deleted")
-						})
-					})
-				})
-			}
-
+			execute(`docker stop ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web`, (result) => {
+				condole.log("Container deleted")
+			})
 		})
 	}
 	else {
