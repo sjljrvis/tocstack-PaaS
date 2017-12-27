@@ -2,7 +2,8 @@ var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req, res) => {
   let containerName = req.query.containerName;
-  execute('docker inspect '+req.query.containerName, (result) => {
+  execute('docker inspect ' + req.query.containerName, (result) => {
+    console.log('----->>',result)
     result = JSON.parse(result);
     res.status(200).json(result);
   })
@@ -11,7 +12,7 @@ module.exports.monitorContainer = (req, res) => {
 module.exports.executeCommand = (req, res) => {
   let containerName = req.query.containerName;
   let command = req.body.command
-  execute('docker run '+req.query.containerName+" "+command, (result) => {
+  execute('docker run ' + req.query.containerName + " " + command, (result) => {
     res.status(200).send(result);
   })
 
