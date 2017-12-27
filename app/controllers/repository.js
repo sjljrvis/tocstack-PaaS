@@ -14,8 +14,7 @@ module.exports.createRepository = (req, res) => {
 			execshell(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,
 				(err, stdout) => {
 					if (err) {
-						console.log('>>>>>>>>>', err)
-						return;
+						return res.status(200).json({ status: 'false', message: 'Repository already exists please choose another name' });
 					}
 					else {
 						var repoPath = rootDirectory + userName + '/' + repositoryName
@@ -45,9 +44,7 @@ module.exports.createRepository = (req, res) => {
 				})
 		} catch (err) {
 			if (err.code !== 'EEXIST')
-				console.log("Error", err);
-			console.log('Check2');
-			res.json({ status: 'false', message: 'Repository already exists please choose another name' })
+				res.json({ status: 'false', message: 'Repository already exists please choose another name' })
 			return;
 		}
 	}
