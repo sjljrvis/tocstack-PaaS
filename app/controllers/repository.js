@@ -14,6 +14,7 @@ module.exports.createRepository = (req, res) => {
 			execshell(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,
 				(err, stdout) => {
 					if (err) {
+						console.log('>>>>>>>>>', err)
 						return;
 					}
 					else {
@@ -21,7 +22,7 @@ module.exports.createRepository = (req, res) => {
 						execute('git init --bare ' + repoPath, (result) => {
 							fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync(`${callDockerPath}/calldocker.js`));
 							fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
-							fs.writeFileSync(repoPath + "/containerName.txt", fs.readFileSync(`${shellScriptPath}/containerName.txt`));							
+							fs.writeFileSync(repoPath + "/containerName.txt", fs.readFileSync(`${shellScriptPath}/containerName.txt`));
 							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
 							exec(`chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
 								let repositoryData = {
