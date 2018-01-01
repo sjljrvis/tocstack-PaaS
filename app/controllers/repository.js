@@ -18,10 +18,13 @@ module.exports.createRepository = (req, res) => {
 						return res.status(200).json({ status: 'false', message: 'Repository already exists please choose another name' });
 					}
 					else {
-						req.app.db.models.Repository.create(repositoryData, (err, result) => {
+						req.app.db.models.Repository.findOne({ repositoryName: repositoryName }, (err, repository) => {
 							if (err) {
 								console.log("Error", err);
 								return;
+							}
+							if(repository){
+								res.json({ status: 'false', message: 'Repository already exists please choose another name' })
 							}
 							else {
 								var repoPath = rootDirectory + userName + '/' + repositoryName
@@ -44,9 +47,9 @@ module.exports.createRepository = (req, res) => {
 												return;
 											}
 											res.json({ status: 'true', message: 'Repository created successfully' })
-										})
-									})
-								})
+										});
+									});
+								});
 							}
 						});
 					}
