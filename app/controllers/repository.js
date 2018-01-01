@@ -18,29 +18,37 @@ module.exports.createRepository = (req, res) => {
 						return res.status(200).json({ status: 'false', message: 'Repository already exists please choose another name' });
 					}
 					else {
-						var repoPath = rootDirectory + userName + '/' + repositoryName
-						execute('git init --bare ' + repoPath, (result) => {
-							fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync(`${callDockerPath}/calldocker.js`));
-							fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
-							fs.writeFileSync(repoPath + "/containerName.txt", fs.readFileSync(`${shellScriptPath}/containerName.txt`));
-							/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
-							exec(`chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
-								let repositoryData = {
-									repositoryName: repositoryName,
-									userName: userName,
-									path: repoPath,
-									pathDocker: repoPath + '_docker',
-									language: language
-								}
-								req.app.db.models.Repository.create(repositoryData, (err, result) => {
-									if (err) {
-										console.log("Error", err);
-										return;
-									}
-									res.json({ status: 'true', message: 'Repository created successfully' })
+						req.app.db.models.Repository.create(repositoryData, (err, result) => {
+							if (err) {
+								console.log("Error", err);
+								return;
+							}
+							else {
+								var repoPath = rootDirectory + userName + '/' + repositoryName
+								execute('git init --bare ' + repoPath, (result) => {
+									fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync(`${callDockerPath}/calldocker.js`));
+									fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
+									fs.writeFileSync(repoPath + "/containerName.txt", fs.readFileSync(`${shellScriptPath}/containerName.txt`));
+									/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
+									exec(`chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
+										let repositoryData = {
+											repositoryName: repositoryName,
+											userName: userName,
+											path: repoPath,
+											pathDocker: repoPath + '_docker',
+											language: language
+										}
+										req.app.db.models.Repository.create(repositoryData, (err, result) => {
+											if (err) {
+												console.log("Error", err);
+												return;
+											}
+											res.json({ status: 'true', message: 'Repository created successfully' })
+										})
+									})
 								})
-							})
-						})
+							}
+						});
 					}
 				})
 		} catch (err) {
