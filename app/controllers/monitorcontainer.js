@@ -1,4 +1,5 @@
 import { NGINX_DIRECTORY } from '../../config'
+const fs = require('fs')
 var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req, res) => {
