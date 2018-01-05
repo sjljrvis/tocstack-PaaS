@@ -1,4 +1,4 @@
-import { NGINX_DIRECTORY } from '../../config'
+import { NGINX_DIRECTORY ,NGINX_SITES_ENABLED} from '../../config'
 const fs = require('fs')
 var exec = require('child_process').exec;
 
