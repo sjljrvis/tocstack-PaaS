@@ -2,7 +2,8 @@ const fs = require('fs')
 var exec = require('child_process').exec;
 import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
-import { callDockerPath, shellScriptPath } from '../../config'
+import { callDockerPath, shellScriptPath,token } from '../../config'
+import request from 'request'
 module.exports.createRepository = (req, res) => {
 
 	if (req.JWTData) {
@@ -23,7 +24,7 @@ module.exports.createRepository = (req, res) => {
 								console.log("Error", err);
 								return;
 							}
-							if(repository){
+							if (repository) {
 								res.json({ status: 'false', message: 'Repository already exists please choose another name' })
 							}
 							else {
@@ -46,7 +47,15 @@ module.exports.createRepository = (req, res) => {
 												console.log("Error", err);
 												return;
 											}
-											res.json({ status: 'true', message: 'Repository created successfully' })
+											updateDigitalocean(repositoryName, (err, result) => {
+												if (err) {
+													console.log("Error", err);
+													return;
+												}
+												else {
+													res.json({ status: 'true', message: 'Repository created successfully' })
+												}
+											})
 										});
 									});
 								});
@@ -106,6 +115,8 @@ module.exports.getAllRepositories = (req, res) => {
 		res.status(403).json({ status: false, message: "Session timed out" })
 	}
 }
+
+
 var execute = (command, callback) => {
 	exec(command, (error, stdout, stderr) => {
 		console.log("Error", error);
@@ -114,3 +125,59 @@ var execute = (command, callback) => {
 		callback(stdout);
 	});
 };
+
+
+var updateDigitalocean = (repositoryName, callback) => {
+	makeRequestToDigitalOcean("POST", repositoryName, (err, body) => {
+		if (err) {
+			return callback(err, { status: false, message: "Error in digitalOcean" });
+		}
+		else {
+			callback(null, { status: "success", message: "record created successfully" });
+		}
+	})
+}
+
+var makeRequestToDigitalOcean = (method, repositoryName, callback) => {
+	let options = {};
+	if (method == "GET") {
+		options = {
+			url: "https://api.digitalocean.com/v2/domains/tocstack.com/records",
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + token
+			}
+		}
+	}
+	else if (method == "POST") {
+		options = {
+			url: "https://api.digitalocean.com/v2/domains/tocstack.com/records",
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + token
+			},
+			body: JSON.stringify(
+				{
+					"type": "A",
+					"name": repositoryName,
+					"data": "139.59.69.254",
+					"priority": null,
+					"port": null,
+					"ttl": 1800,
+					"weight": null,
+					"flags": null,
+					"tag": null
+				})
+		}
+	}
+	request(options, (error, response, body) => {
+		if (error) {
+			console.log("Error", error);
+			return;
+		}
+		console.log("Response", body)
+		callback(null, body)
+	})
+}
