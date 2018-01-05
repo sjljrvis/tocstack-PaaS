@@ -58,7 +58,7 @@ module.exports.createNginx = (req, res) => {
 					return;
 				}
 				else {
-					res.json({ status: true, message: success })
+					res.json({ status: true, message: "success" })
 				}
 			});
 		}
@@ -73,7 +73,7 @@ module.exports.updateNginx = (req, res) => {
 		}
 		else {
 			execute('sudo service nginx restart', (stdout) => {
-				res.json({ status: true, message: success })
+				res.json({ status: true, message: "success" })
 			})
 		}
 	})
