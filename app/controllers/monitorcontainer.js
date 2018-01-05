@@ -1,3 +1,4 @@
+import { NGINX_DIRECTORY } from '../../config'
 var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req, res) => {
@@ -43,29 +44,37 @@ module.exports.reloadNginx = (req, res) => {
 	})
 }
 module.exports.createNginx = (req, res) => {
-	res.json(req.body);
-	// fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err, data) => {
-	// 	if (err) {
-	// 		console.error('Error in writing file', err)
-	// 		callback(err, null);
-	// 	}
-	// 	else {
-	// 		console.log('successssss')
-	// 		exec(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com`, (err, stderr, stdout) => {
-	// 			if (err) {
-	// 				console.log("error in git-work-tree", err);
-	// 			}
-	// 			else {
-
-	// 				callback(null, true);
-	// 			}
-	// 		});
-	// 	}
-	// })
+	let { repositoryName, nginx } = req.body
+	fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err, data) => {
+		if (err) {
+			console.error('Error in writing file', err)
+			return;
+		}
+		else {
+			exec(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`, (err, stderr, stdout) => {
+				if (err) {
+					console.log("error in git-work-tree", err);
+					return;
+				}
+				else {
+					res.json({ status: true, message: success })
+				}
+			});
+		}
+	})
 }
 module.exports.updateNginx = (req, res) => {
-	execute('sudo service nginx reload', (result) => {
-		res.send(result);
+	let { repositoryName, nginx } = req.body
+	fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err, data) => {
+		if (err) {
+			console.error('Error in writing file', err)
+			return;
+		}
+		else {
+			execute('sudo service nginx restart', (stdout) => {
+				res.json({ status: true, message: success })
+			})
+		}
 	})
 }
 
