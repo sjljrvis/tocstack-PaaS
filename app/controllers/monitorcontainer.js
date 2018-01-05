@@ -42,6 +42,33 @@ module.exports.reloadNginx = (req, res) => {
 		res.send(result);
 	})
 }
+module.exports.createNginx = (req, res) => {
+	res.json(req.body);
+	// fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err, data) => {
+	// 	if (err) {
+	// 		console.error('Error in writing file', err)
+	// 		callback(err, null);
+	// 	}
+	// 	else {
+	// 		console.log('successssss')
+	// 		exec(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com`, (err, stderr, stdout) => {
+	// 			if (err) {
+	// 				console.log("error in git-work-tree", err);
+	// 			}
+	// 			else {
+
+	// 				callback(null, true);
+	// 			}
+	// 		});
+	// 	}
+	// })
+}
+module.exports.updateNginx = (req, res) => {
+	execute('sudo service nginx reload', (result) => {
+		res.send(result);
+	})
+}
+
 var execute = (command, callback) => {
 	exec(command, (error, stdout, stderr) => {
 		callback(stdout);
