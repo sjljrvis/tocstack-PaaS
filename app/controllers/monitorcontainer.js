@@ -35,7 +35,8 @@ module.exports.viewGitCommits = (req, res) => {
 
 }
 module.exports.fetchLogs = (req, res) => {
-	execute('docker logs sejal_testingapp_stunning-wing', (result) => {
+	let appName = req.params.app ;
+	execute(`docker logs ${appName}docker_web_1`, (result) => {
 		res.send(result);
 	})
 }
@@ -62,7 +63,7 @@ module.exports.createNginx = (req, res) => {
 				else {
 					res.json({ status: true, message: "success" });
 					req.app.db.models.Repository.findOneAndUpdate({repositoryName : repositoryName} , {isDeployed:true} , (err , result) =>{
-						
+
 					})
 				}
 			});
