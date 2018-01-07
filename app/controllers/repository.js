@@ -87,7 +87,7 @@ module.exports.deleteRepository = (req, res) => {
 				console.log("Error", err);
 				return;
 			}
-			execute('rm -rf ' + repositoryData.path, (result) => {
+			execute(`rm -rf ${repositoryData.path} && rm -rf ${repositoryData.pathDocker} `, (result) => {
 				console.log(result)
 				res.json({ status: true, message: "Deleted" })
 			})

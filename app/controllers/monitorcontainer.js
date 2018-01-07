@@ -52,6 +52,7 @@ module.exports.createNginx = (req, res) => {
 			return;
 		}
 		else {
+			console.log(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`);
 			exec(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`, (err, stderr, stdout) => {
 				if (err) {
 					console.log("error in git-work-tree", err);
