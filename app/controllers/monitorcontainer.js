@@ -73,6 +73,7 @@ module.exports.updateNginx = (req, res) => {
 			return;
 		}
 		else {
+			console.log(">>>>" , data)
 			execute('sudo service nginx restart', (stdout) => {
 				res.json({ status: true, message: "success" })
 			})
