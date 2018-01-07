@@ -67,14 +67,13 @@ module.exports.createNginx = (req, res) => {
 }
 module.exports.updateNginx = (req, res) => {
 	let { repositoryName, nginx } = req.body
-	fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err, data) => {
+	fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`, nginx, (err) => {
 		if (err) {
 			console.error('Error in writing file', err)
 			return;
 		}
 		else {
-			console.log(">>>>" , data)
-			execute('sudo service nginx restart', (stdout) => {
+			execute('sudo service nginx reload', (stdout) => {
 				res.json({ status: true, message: "success" })
 			})
 		}
