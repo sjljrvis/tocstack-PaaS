@@ -1,4 +1,5 @@
 import { NGINX_DIRECTORY ,NGINX_SITES_ENABLED} from '../../config'
+import { read } from 'fs';
 const fs = require('fs')
 var exec = require('child_process').exec;
 
@@ -59,7 +60,10 @@ module.exports.createNginx = (req, res) => {
 					return;
 				}
 				else {
-					res.json({ status: true, message: "success" })
+					res.json({ status: true, message: "success" });
+					req.app.db.models.Repository.findOneAndUpdate({repositoryName : repositoryName} , {isDeployed:true} , (err , result) =>{
+						
+					})
 				}
 			});
 		}
