@@ -11,9 +11,9 @@ module.exports.monitorContainer = (req, res) => {
 		result = JSON.parse(result);
 		if (result.length > 0) {
 			let _result = [{
-				State: { Pid: result[0].State.Pid },
+				State: result[0].State ,
 				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
-				NetworkSettings:  result[0].Networks
+				NetworkSettings:  result[0].NetworkSettings.Networks
 			}
 			]
 			console.log(_result);
