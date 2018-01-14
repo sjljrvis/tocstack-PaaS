@@ -1,4 +1,4 @@
-import { NGINX_DIRECTORY ,NGINX_SITES_ENABLED} from '../../config'
+import { NGINX_DIRECTORY, NGINX_SITES_ENABLED } from '../../config'
 import { read } from 'fs';
 const fs = require('fs')
 var exec = require('child_process').exec;
@@ -9,14 +9,14 @@ module.exports.monitorContainer = (req, res) => {
 	console.log(req.query.containerName)
 	execute('docker inspect ' + req.query.containerName, (result) => {
 		result = JSON.parse(result);
-		console.log(result);
 		if (result.length > 0) {
 			let _result = [{
-				State: { Pid: result[0].State.Pid},
+				State: { Pid: result[0].State.Pid },
 				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
-				NetworkSettings: { IPAddress:result[0].Networks[containerDefault].IPAddress , MacAddress: result[0].Networks[containerDefault].MacAddress }
+				NetworkSettings: { IPAddress: result[0].Networks[containerDefault].IPAddress, MacAddress: result[0].Networks[containerDefault].MacAddress }
 			}
 			]
+			console.log(_result);
 			res.status(200).json(_result);
 		}
 		else {
@@ -44,7 +44,7 @@ module.exports.viewGitCommits = (req, res) => {
 
 }
 module.exports.fetchLogs = (req, res) => {
-	let appName = req.params.app ;
+	let appName = req.params.app;
 	execute(`docker logs ${appName}docker_web_1`, (result) => {
 		res.send(result);
 	})
@@ -71,7 +71,7 @@ module.exports.createNginx = (req, res) => {
 				}
 				else {
 					res.json({ status: true, message: "success" });
-					req.app.db.models.Repository.findOneAndUpdate({repositoryName : repositoryName} , {isDeployed:true} , (err , result) =>{
+					req.app.db.models.Repository.findOneAndUpdate({ repositoryName: repositoryName }, { isDeployed: true }, (err, result) => {
 
 					})
 				}
