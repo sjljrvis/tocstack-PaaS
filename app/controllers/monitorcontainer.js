@@ -13,7 +13,7 @@ module.exports.monitorContainer = (req, res) => {
 			let _result = [{
 				State: { Pid: result[0].State.Pid },
 				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
-				NetworkSettings: { IPAddress: result[0].Networks[containerDefault].IPAddress, MacAddress: result[0].Networks[containerDefault].MacAddress }
+				NetworkSettings: { IPAddress: result[0].Networks[`${containerDefault}`].IPAddress, MacAddress: result[0].Networks[`${containerDefault}`].MacAddress }
 			}
 			]
 			console.log(_result);
