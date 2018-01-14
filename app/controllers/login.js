@@ -4,10 +4,10 @@ module.exports.loginPage = function (req, res, next) {
 		email: req.body.email
 	}, function (err, user) {
 		if (err) {
-			return res.status(400).json({ message: 'Please check all fields' });
+			return res.status(401).json({ status: false, message: 'Please check all fields' });
 		}
 		if (user == null) {
-			res.status(401).json({ message: 'User does not exist.' });
+			res.status(401).json({ status: false, message: 'User with this email-id does not exist' });
 		}
 		else {
 			if (user.validPassword(req.body.password)) {
@@ -18,7 +18,8 @@ module.exports.loginPage = function (req, res, next) {
 				};
 				var token = req.app.jwt.sign(payload, req.app.config.jwtSecret);
 				res.cookie('token', token);
-				res.json({
+				res.status(200).json({
+					status: true,
 					user: req.JWTData,
 					userName: payload.userName,
 					email: payload.email,
@@ -26,7 +27,7 @@ module.exports.loginPage = function (req, res, next) {
 					token: token
 				});
 			} else {
-				res.status(401).json({ message: 'Email or password is wrong.' });
+				res.status(401).json({ status: false, message: 'Email or password is wrong.' });
 			}
 		}
 	});

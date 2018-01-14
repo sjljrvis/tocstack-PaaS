@@ -91,7 +91,7 @@ module.exports.deleteRepository = (req, res) => {
 				console.log(result)
 				res.json({ status: true, message: "Deleted" })
 			})
-			execute(`docker stop ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web`, (result) => {
+			execute(`docker stop ${repositoryName}docker_web_1 && docker rm ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web`, (result) => {
 				console.log("Container deleted")
 			})
 		})

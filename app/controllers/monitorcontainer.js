@@ -5,8 +5,10 @@ var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req, res) => {
 	let containerName = req.query.containerName;
+	console.log(req.query.containerName)
 	execute('docker inspect ' + req.query.containerName, (result) => {
 		result = JSON.parse(result);
+		console.log(result);
 		if (result.length > 0) {
 			res.status(200).json(result);
 		}
