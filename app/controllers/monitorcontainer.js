@@ -5,12 +5,19 @@ var exec = require('child_process').exec;
 
 module.exports.monitorContainer = (req, res) => {
 	let containerName = req.query.containerName;
+	let containerDefault = `${req.query.containerName.split('_')[0]}_default`
 	console.log(req.query.containerName)
 	execute('docker inspect ' + req.query.containerName, (result) => {
 		result = JSON.parse(result);
 		console.log(result);
 		if (result.length > 0) {
-			res.status(200).json(result);
+			let _result = [{
+				State: { Pid: result[0].State.Pid},
+				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
+				NetworkSettings: { IPAddress:result[0].Networks[containerDefault].IPAddress , MacAddress: result[0].Networks[containerDefault].MacAddress }
+			}
+			]
+			res.status(200).json(_result);
 		}
 		else {
 			let _result = [{
