@@ -10,7 +10,7 @@ module.exports.createRepository = (req, res) => {
 
 		let userName = req.JWTData.userName;
 		let repositoryName = req.body.repositoryName;
-		let language = req.body.language;
+		let language = req.body.language || "nodeJS";
 
 		try {
 			execshell(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,
