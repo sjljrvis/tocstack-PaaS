@@ -34,7 +34,7 @@ module.exports.monitorContainer = (req, res) => {
 module.exports.executeCommand = (req, res) => {
 	let containerName = req.query.containerName;
 	let command = req.body.command
-	execute('docker run ' + req.query.containerName + " " + command, (result) => {
+	execute('docker exec ' + req.query.containerName + " " + command, (result) => {
 		res.status(200).send(result);
 	})
 
