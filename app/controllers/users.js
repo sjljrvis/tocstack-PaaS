@@ -127,45 +127,64 @@ module.exports.addUser = (req, res) => {
 module.exports.editUser = (req, res) => {
 
 	var user = {
-		firstName: req.body.firstName,
-		lastName: req.body.lastName,
-		// email : req.body.email,
-		username: req.body.username,
-		permissions: req.body.permissions
+		$set: {
+			password: "",
+			confirmPassword: ""
+		}
 	};
 	if (req.body.password) {
-		var SALT_FACTOR = 5;
-		req.app.bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
+
+		req.app.db.models.User.findOne({ userName: req.body.userName }, (err, userData) => {
 			if (err) {
 				res.json({ "message": "error" });
-				return
+				return;
 			}
-			req.app.bcrypt.hash(req.body.password, salt, function (err, hash) {
-				if (err) {
-					res.json({ "message": "error" });
-					return
-				}
-				user.password = hash;
-				req.app.db.models.User.findByIdAndUpdate(req.body.userId, user, (err, data) => {
-					if (err) {
-						console.log("Error", err);
-						res.json({ "message": "error" });
-					}
-					res.json({ "message": "success" });
-				});
-			});
-		});
-	}
-	else {
-		req.app.db.models.User.findByIdAndUpdate(req.body.userId, user, (err, data) => {
+			else {
+				if (userData.validPassword(req.body.oldPassword)) {
+					var SALT_FACTOR = 5;
+					req.app.bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
+						if (err) {
+							res.json({ "message": "error" });
+							return
+						}
+						req.app.bcrypt.hash(req.body.password, salt, (err, hash) => {
+							if (err) {
+								res.json({ "message": "error" });
+								return
+							}
+							user.$set.password = hash;
+							user.$set.confirmPassword = hash;
+							req.app.db.models.User.findByIdAndUpdate(req.body.userId, user, (err, data) => {
+								if (err) {
+									console.log("Error", err);
+									return;
+								}
+								res.json({ "message": "success" });
+							});
+						});
+					});
 
-			if (err) {
-				console.log("Error", err);
-				res.json({
-					"message": "error"
-				});
+					let passwordData = `${req.body.userName}:${md5(req.body.password)}`
+					fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
+						if (err) {
+							return;
+						}
+						else {
+							execshell(` sudo chown www-data ${rootDirectory+req.body.userName}/htpasswd && sudo service nginx reload`, (err, stdout) => {
+								if (err) {
+									return;
+								}
+								else {
+									console.log({ status: "true", message: "Password file updated" })
+								}
+							})
+						}
+					})
+				}
+				else {
+					res.json({ status: "false", "message": "Old password in incorrect" });
+				}
 			}
-			res.json({ "message": "success" });
 		});
 	}
 };

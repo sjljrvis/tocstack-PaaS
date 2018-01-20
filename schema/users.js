@@ -13,7 +13,6 @@ export const UserSchema = function (app, mongoose) {
       type: Date,
       default: Date.now()
     },
-
   });
 
   UserSchema.plugin(require('./plugins/pagedFind'));
