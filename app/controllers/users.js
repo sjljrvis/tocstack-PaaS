@@ -154,7 +154,7 @@ module.exports.editUser = (req, res) => {
 							}
 							user.$set.password = hash;
 							user.$set.confirmPassword = hash;
-							req.app.db.models.User.findByIdAndUpdate(req.body.userId, user, (err, data) => {
+							req.app.db.models.User.findByIdAndUpdate(userData._id, user, (err, data) => {
 								if (err) {
 									console.log("Error", err);
 									return;
@@ -165,7 +165,7 @@ module.exports.editUser = (req, res) => {
 					});
 
 					let passwordData = `${req.body.userName}:${md5(req.body.password)}`
-					fs.writeFile(`${rootDirectory + data.userName}/htpasswd`, passwordData, (data) => {
+					fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`, passwordData, (data) => {
 						if (err) {
 							return;
 						}
@@ -182,7 +182,7 @@ module.exports.editUser = (req, res) => {
 					})
 				}
 				else {
-					res.json({ status: false, "message": "Old password in incorrect" });
+					res.json({ status: false, "message": "Old password is incorrect" });
 				}
 			}
 		});
