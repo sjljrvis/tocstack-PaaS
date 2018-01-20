@@ -24,13 +24,6 @@ export const RepositorySchema = function (app, mongoose) {
 	});
 
 	RepositorySchema.plugin(require('./plugins/pagedFind'));
-	// RepositorySchema.index({
-	//   _id: 1
-	// });
-	//  RepositorySchema.set('autoIndex', (app.get('env') === 'development'));
-
-
-
 	app.db.model('Repository', RepositorySchema);
 
 };

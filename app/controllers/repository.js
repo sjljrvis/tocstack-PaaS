@@ -2,8 +2,9 @@ const fs = require('fs')
 var exec = require('child_process').exec;
 import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
-import { callDockerPath, shellScriptPath,token } from '../../config'
+import { callDockerPath, shellScriptPath, token , NGINX_DIRECTORY , NGINX_SITES_ENABLED } from '../../config'
 import request from 'request'
+
 module.exports.createRepository = (req, res) => {
 
 	if (req.JWTData) {
@@ -90,9 +91,23 @@ module.exports.deleteRepository = (req, res) => {
 			execute(`rm -rf ${repositoryData.path} && rm -rf ${repositoryData.pathDocker} `, (result) => {
 				console.log(result)
 				res.json({ status: true, message: "Deleted" })
-			})
+			});
 			execute(`docker stop ${repositoryName}docker_web_1 && docker rm ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web`, (result) => {
 				console.log("Container deleted")
+			});
+
+			execute(`rm ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com && rm ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`, (result) => {
+				console.log("Container deleted")
+			});
+
+			deleteDigitalOcean(repositoryName, (err, body) => {
+				if (err) {
+					console.log({ status: false, message: " Unable to delete record" })
+					return;
+				}
+				else {
+					console.log(body)
+				}
 			})
 		})
 	}
@@ -128,7 +143,7 @@ var execute = (command, callback) => {
 
 
 var updateDigitalocean = (repositoryName, callback) => {
-	makeRequestToDigitalOcean("POST", repositoryName, (err, body) => {
+	makeRequestToDigitalOcean("POST", repositoryName, null, (err, body) => {
 		if (err) {
 			return callback(err, { status: false, message: "Error in digitalOcean" });
 		}
@@ -138,7 +153,28 @@ var updateDigitalocean = (repositoryName, callback) => {
 	})
 }
 
-var makeRequestToDigitalOcean = (method, repositoryName, callback) => {
+let deleteDigitalOcean = (repositoryName, callback) => {
+	makeRequestToDigitalOcean("GET", repositoryName, null, (err, body) => {
+		if (err) {
+			return callback(err, { status: false, message: "Error in digitalOcean" });
+		}
+		else {
+			let domainRecords = JSON.parse(body).domain_records;
+			let recordId = domainRecords.filter(x => x.name == "boupon").map((x) => { return x.id })[0];
+			makeRequestToDigitalOcean("DELETE", repositoryName, recordId, (err, body) => {
+				if (err) {
+					return callback(err, { status: false, message: "Error in digitalOcean" });
+				}
+				else {
+					return callback(null, { status: true, message: "Deleted successfully" })
+				}
+			});
+		}
+	})
+}
+
+
+var makeRequestToDigitalOcean = (method, repositoryName, recordId, callback) => {
 	let options = {};
 	if (method == "GET") {
 		options = {
@@ -172,12 +208,22 @@ var makeRequestToDigitalOcean = (method, repositoryName, callback) => {
 				})
 		}
 	}
+	else if (method == "DELETE") {
+		options = {
+			url: `https://api.digitalocean.com/v2/domains/tocstack.com/records/${recordId}`,
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + token
+			},
+		}
+	}
 	request(options, (error, response, body) => {
 		if (error) {
 			console.log("Error", error);
 			return;
 		}
-		console.log("Response", body)
+		//console.log("Response", body)
 		callback(null, body)
 	})
 }
