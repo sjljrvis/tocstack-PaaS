@@ -159,7 +159,7 @@ module.exports.editUser = (req, res) => {
 									console.log("Error", err);
 									return;
 								}
-								res.json({ "message": "success" });
+								res.json({status: true, message: "Password updated"});
 							});
 						});
 					});
@@ -175,14 +175,14 @@ module.exports.editUser = (req, res) => {
 									return;
 								}
 								else {
-									console.log({ status: "true", message: "Password file updated" })
+									console.log({ status: true, message: "Password file updated" })
 								}
 							})
 						}
 					})
 				}
 				else {
-					res.json({ status: "false", "message": "Old password in incorrect" });
+					res.json({ status: false, "message": "Old password in incorrect" });
 				}
 			}
 		});
