@@ -49,7 +49,6 @@ module.exports.fetchLogs = (req, res) => {
 		res.send(result);
 	})
 }
-
 module.exports.reloadNginx = (req, res) => {
 	execute('sudo service nginx reload', (result) => {
 		res.send(result);
@@ -93,7 +92,9 @@ module.exports.updateNginx = (req, res) => {
 		}
 	})
 }
-
+module.exports.pauseContainer = (req,res) =>{
+	
+}
 var execute = (command, callback) => {
 	exec(command, (error, stdout, stderr) => {
 		callback(stdout);
