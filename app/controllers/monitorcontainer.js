@@ -11,9 +11,9 @@ module.exports.monitorContainer = (req, res) => {
 		result = JSON.parse(result);
 		if (result.length > 0) {
 			let _result = [{
-				State: result[0].State ,
+				State: result[0].State,
 				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
-				NetworkSettings:  result[0].NetworkSettings.Networks
+				NetworkSettings: result[0].NetworkSettings.Networks
 			}
 			]
 			console.log(_result);
@@ -92,8 +92,11 @@ module.exports.updateNginx = (req, res) => {
 		}
 	})
 }
-module.exports.pauseContainer = (req,res) =>{
-	
+module.exports.pauseContainer = (req, res) => {
+	let appName = req.params.app;
+	execute(`docker pause ${appName}docker_web_1`, (result) => {
+		res.send(result);
+	})
 }
 var execute = (command, callback) => {
 	exec(command, (error, stdout, stderr) => {
