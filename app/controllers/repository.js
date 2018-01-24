@@ -32,10 +32,11 @@ module.exports.createRepository = (req, res) => {
 								var repoPath = rootDirectory + userName + '/' + repositoryName
 								execute('git init --bare ' + repoPath, (result) => {
 									fs.writeFileSync(repoPath + "/calldocker.js", fs.readFileSync(`${callDockerPath}/calldocker.js`));
-									fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
+									// fs.writeFileSync(repoPath + "/hooks/post-receive", fs.readFileSync(`${shellScriptPath}/post-receive`));
+									fs.writeFileSync(repoPath + "/hooks/pre-receive", fs.readFileSync(`${shellScriptPath}/pre-receive`));
 									fs.writeFileSync(repoPath + "/containerName.txt", fs.readFileSync(`${shellScriptPath}/containerName.txt`));
 									/*'chmod +x ' + repoPath + '/hooks/post-receive'*/
-									exec(`chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
+									exec(`chmod +x  ${repoPath + '/hooks/pre-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`, (error, stdout, stderr) => {
 										let repositoryData = {
 											repositoryName: repositoryName,
 											userName: userName,
