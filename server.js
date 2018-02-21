@@ -28,10 +28,6 @@ app.config = config;
 
 global.__base = __dirname;
 
-
-
-var request = require('request');
-var token = "38936697bd54da1c86dbf68e737f49cd60492d5a8c31d7ce4b6b76bce1450b06";
 //app.use('*', require('./middleware/decodeJWT').decodeToken);
 
 app.db = mongoose.createConnection(config.mongodb.uri);
