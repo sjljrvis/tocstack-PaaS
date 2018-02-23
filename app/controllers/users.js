@@ -1,8 +1,11 @@
 import fs from 'fs';
-import { exec } from 'child_process';
+import crypto from 'crypto';
 import md5 from 'apache-md5';
+import { exec } from 'child_process';
 import { rootDirectory } from '../helper/constant';
 import { execshell } from '../helper/functions';
+import { hashSecret } from '../../config';
+const cipher = crypto.createCipher('aes192', hashSecret);
 
 module.exports.viewAllUsers = (req, res) => {
 	req.query.search = req.query.search ? req.query.search : '';
@@ -61,18 +64,17 @@ module.exports.deleteUser = (req, res) => {
 
 
 module.exports.addUser = (req, res) => {
+	let encrypted = cipher.update(JSON.stringify({ userName: req.body.userName, timeStamp: Date.now() }), 'utf8', 'hex');
+	encrypted += cipher.final('hex');
+
 	let user = {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		password: req.body.password,
 		userName: req.body.userName,
 		email: req.body.email,
+		s3Token: encrypted
 	};
-	let hashObject = {
-		userName: req.body.firstName,
-		password: req.body.password,
-		timeStamp: Date.now()
-	}
 
 	if (!req.body.password || !req.body.email) {
 		res.json({ "message": "error" });
@@ -135,11 +137,11 @@ module.exports.editUser = (req, res) => {
 	var user = {
 		$set: {
 			password: "",
-			confirmPassword: ""
+			confirmPassword: "",
+			s3Token: ""
 		}
 	};
 	if (req.body.password) {
-
 		req.app.db.models.User.findOne({ userName: req.body.userName }, (err, userData) => {
 			if (err) {
 				res.json({ "message": "error" });
@@ -158,6 +160,10 @@ module.exports.editUser = (req, res) => {
 								res.json({ "message": "error" });
 								return
 							}
+							let encrypted = cipher.update(JSON.stringify({ userName: userData.userName, timeStamp: Date.now() }), 'utf8', 'hex');
+							encrypted += cipher.final('hex');
+							console.log(encrypted);
+							user.$set.s3Token = encrypted;
 							user.$set.password = hash;
 							user.$set.confirmPassword = hash;
 							req.app.db.models.User.findByIdAndUpdate(userData._id, user, (err, data) => {

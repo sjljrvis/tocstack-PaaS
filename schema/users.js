@@ -1,7 +1,5 @@
 'use strict';
 
-import crypto from 'crypto';
-import { hashSecret } from '../config';
 
 export const UserSchema = function (app, mongoose) {
 	var UserSchema = new mongoose.Schema({
@@ -47,12 +45,8 @@ export const UserSchema = function (app, mongoose) {
 					return next(err);
 				}
 				else {
-					const cipher = crypto.createCipher('aes192', hashSecret);
-					let encrypted = cipher.update(JSON.stringify({userName:user.userName , timeStamp : Date.now()}), 'utf8', 'hex');
-					encrypted += cipher.final('hex');
-					console.log(encrypted);
+
 					user.password = hash;
-					user.s3Token = encrypted;
 					next();
 				}
 			});
