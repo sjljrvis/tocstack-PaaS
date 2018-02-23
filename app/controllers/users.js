@@ -64,6 +64,7 @@ module.exports.deleteUser = (req, res) => {
 
 
 module.exports.addUser = (req, res) => {
+
 	let encrypted = cipher.update(JSON.stringify({ userName: req.body.userName, timeStamp: Date.now() }), 'utf8', 'hex');
 	encrypted += cipher.final('hex');
 
@@ -194,3 +195,25 @@ module.exports.editUser = (req, res) => {
 		});
 	}
 };
+
+
+module.exports.generates3Token = (req, res) => {
+	req.app.db.models.User.findOne({ email: req.JWTData.email }, (err, user) => {
+		if (user) {
+			try {
+				let encrypted = cipher.update(JSON.stringify({ userName: user.userName, timeStamp: Date.now() }), 'utf8', 'hex');
+				encrypted += cipher.final('hex');
+				console.log(encrypted);
+				user.s3Token = encrypted;
+				user.save();
+				return res.status(200).json({ status: true, "message": "Generated token successfully", "s3Token": encrypted });
+			}
+			catch (execption) {
+				return res.status(200).json({ status: false, "message": "Sorry ! Could generate Token , Please try after some time" });
+			}
+		}
+		else {
+			return res.status(200).json({ status: false, "message": "Invalid user" });
+		}
+	});
+}

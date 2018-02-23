@@ -42,4 +42,4 @@ import { indexRoute } from './app/routes';
 indexRoute(app);
 app.listen(port, () => {
 	console.log('server running on :' + port)
-})
+});
