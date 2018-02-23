@@ -1,8 +1,8 @@
-const fs = require('fs')
-var exec = require('child_process').exec;
-import md5 from 'apache-md5'
-import { rootDirectory } from '../helper/constant'
-import { execshell } from '../helper/functions'
+import fs from 'fs';
+import { exec } from 'child_process';
+import md5 from 'apache-md5';
+import { rootDirectory } from '../helper/constant';
+import { execshell } from '../helper/functions';
 
 module.exports.viewAllUsers = (req, res) => {
 	req.query.search = req.query.search ? req.query.search : '';
@@ -61,13 +61,19 @@ module.exports.deleteUser = (req, res) => {
 
 
 module.exports.addUser = (req, res) => {
-	var user = {
+	let user = {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		password: req.body.password,
 		userName: req.body.userName,
 		email: req.body.email,
 	};
+	let hashObject = {
+		userName: req.body.firstName,
+		password: req.body.password,
+		timeStamp: Date.now()
+	}
+
 	if (!req.body.password || !req.body.email) {
 		res.json({ "message": "error" });
 		return
@@ -159,7 +165,7 @@ module.exports.editUser = (req, res) => {
 									console.log("Error", err);
 									return;
 								}
-								res.json({status: true, message: "Password updated"});
+								res.json({ status: true, message: "Password updated" });
 							});
 						});
 					});
@@ -170,7 +176,7 @@ module.exports.editUser = (req, res) => {
 							return;
 						}
 						else {
-							execshell(` sudo chown www-data ${rootDirectory+req.body.userName}/htpasswd && sudo service nginx reload`, (err, stdout) => {
+							execshell(` sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`, (err, stdout) => {
 								if (err) {
 									return;
 								}
