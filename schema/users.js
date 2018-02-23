@@ -1,6 +1,6 @@
 'use strict';
 
-import crypto from 'cryto';
+import crypto from 'crypto';
 import { hashSecret } from '../config';
 
 export const UserSchema = function (app, mongoose) {
