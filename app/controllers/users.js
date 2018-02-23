@@ -163,16 +163,10 @@ module.exports.editUser = (req, res) => {
 							let encrypted = cipher.update(JSON.stringify({ userName: userData.userName, timeStamp: Date.now() }), 'utf8', 'hex');
 							encrypted += cipher.final('hex');
 							console.log(encrypted);
-							user.$set.s3Token = encrypted;
-							user.$set.password = hash;
-							user.$set.confirmPassword = hash;
-							req.app.db.models.User.findByIdAndUpdate(userData._id, user, (err, data) => {
-								if (err) {
-									console.log("Error", err);
-									return;
-								}
-								res.json({ status: true, message: "Password updated" });
-							});
+							userData.s3Token = encrypted;
+							userData.password = hash;
+							userData.confirmPassword = hash;
+							res.json({ status: true, message: "Password updated" });
 						});
 					});
 

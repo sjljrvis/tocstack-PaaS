@@ -33,7 +33,7 @@ global.__base = __dirname;
 app.db = mongoose.createConnection(config.mongodb.uri);
 app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 app.db.once('open', function () {
-    console.log(config.mongodb.uri);
+	console.log(config.mongodb.uri);
 });
 
 import { models } from './models';
@@ -41,5 +41,5 @@ models(app, mongoose);
 import { indexRoute } from './app/routes';
 indexRoute(app);
 app.listen(port, () => {
-    console.log('server running on :' + port)
+	console.log('server running on :' + port)
 })
