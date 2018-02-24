@@ -65,8 +65,8 @@ module.exports.deleteUser = (req, res) => {
 
 module.exports.addUser = (req, res) => {
 
-	let encrypted = cipher.update(JSON.stringify({ userName: req.body.userName, timeStamp: Date.now() }), 'utf8', 'hex');
-	encrypted += cipher.final('hex');
+	// let encrypted = cipher.update(JSON.stringify({ userName: req.body.userName, timeStamp: Date.now() }), 'utf8', 'hex');
+	// encrypted += cipher.final('hex');
 
 	let user = {
 		firstName: req.body.firstName,
@@ -74,7 +74,7 @@ module.exports.addUser = (req, res) => {
 		password: req.body.password,
 		userName: req.body.userName,
 		email: req.body.email,
-		s3Token: encrypted
+		// s3Token: encrypted
 	};
 
 	if (!req.body.password || !req.body.email) {
