@@ -78,7 +78,7 @@ module.exports.addUser = (req, res) => {
 	};
 
 	if (!req.body.password || !req.body.email) {
-		res.json({ 	"status": "false","message": "Fields can not be empty" });
+		res.json({ "status": "false", "message": "Fields can not be empty" });
 		return
 	}
 	req.app.db.models.User.findOne({
@@ -161,16 +161,16 @@ module.exports.editUser = (req, res) => {
 								res.json({ "message": "error" });
 								return
 							}
-							let encrypted = cipher.update(JSON.stringify({ userName: userData.userName, timeStamp: Date.now() }), 'utf8', 'hex');
+							let encrypted = cipher.update(JSON.stringify({ userName:user.userName + Date.now() }), 'utf8', 'hex');
 							encrypted += cipher.final('hex');
 							console.log(encrypted);
 							userData.s3Token = encrypted;
 							userData.password = hash;
 							userData.confirmPassword = hash;
+							userData.save();
 							res.json({ status: true, message: "Password updated" });
 						});
 					});
-
 					let passwordData = `${req.body.userName}:${md5(req.body.password)}`
 					fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`, passwordData, (data) => {
 						if (err) {
@@ -200,18 +200,40 @@ module.exports.editUser = (req, res) => {
 module.exports.generates3Token = (req, res) => {
 	req.app.db.models.User.findOne({ email: req.JWTData.email }, (err, user) => {
 		if (user) {
-			try {
-				let encrypted = cipher.update(JSON.stringify({ userName: user.userName, timeStamp: Date.now() }), 'utf8', 'hex');
-				encrypted += cipher.final('hex');
-				console.log(encrypted);
-				user.s3Token = encrypted;
-				user.save();
-				return res.status(200).json({ status: true, "message": "Generated token successfully", "s3Token": encrypted });
+			try 
+			{
+				let encrypted = '';
+				cipher.on('readable', () => {
+					const data = cipher.read();
+					if (data) {
+						encrypted = data.toString('hex');
+						user.s3Token = encrypted;
+						user.save();
+					}
+				});
+				console.log({ userName: user.userName + Date.now() })
+				cipher.write(JSON.stringify({ userName: user.userName + Date.now() }))
+				res.status(200).json({ status: true, "message": "Generated token successfully", "s3Token": encrypted });
 			}
 			catch (execption) {
 				return res.status(200).json({ status: false, "message": "Sorry ! Could generate Token , Please try after some time" });
 			}
 		}
+		else {
+			return res.status(200).json({ status: false, "message": "Invalid user" });
+		}
+	});
+}
+
+
+module.exports.shows3Token = (req, res) => {
+	req.app.db.models.User.findOne({ email: req.JWTData.email }, (err, user) => {
+		if(err){
+			return res.status(200).json({ status: false, "message": "Error occured Please try again", "s3Token": "" });
+		}
+		if (user) {
+			return res.status(200).json({ status: true, "message": "Generated token successfully", "s3Token": user.s3Token });
+			}
 		else {
 			return res.status(200).json({ status: false, "message": "Invalid user" });
 		}
