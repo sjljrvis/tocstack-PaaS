@@ -78,7 +78,7 @@ module.exports.addUser = (req, res) => {
 	};
 
 	if (!req.body.password || !req.body.email) {
-		res.json({ "message": "error" });
+		res.json({ 	"status": "false","message": "Fields can not be empty" });
 		return
 	}
 	req.app.db.models.User.findOne({
