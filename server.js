@@ -11,7 +11,6 @@ import cors from "cors";
 import { port, mongodb } from './config';
 
 global.__base = __dirname;
-global.Promise = mongoose.Promise;
 
 const app = express();
 
