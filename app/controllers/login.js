@@ -67,9 +67,9 @@ export const logout = async (req, res) => {
 	}
 }
 
-	module.exports.permissions = function (req, res, next) {
-		res.json({ message: req.JWTData.permissions })
-	};
+export const permissions = (req, res) => {
+	res.json({ message: req.JWTData.permissions })
+};
 
 
 

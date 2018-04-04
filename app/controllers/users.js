@@ -7,40 +7,6 @@ import { execshell } from '../helper/functions';
 import { hashSecret } from '../../config';
 const cipher = crypto.createCipher('aes192', hashSecret);
 
-module.exports.viewAllUsers = (req, res) => {
-	req.query.search = req.query.search ? req.query.search : '';
-	req.query.limit = req.query.limit ? parseInt(req.query.limit, null) : 100;
-	req.query.sort = req.query.sort ? req.query.sort : '_id';
-	req.query.page = req.query.page ? parseInt(req.query.page) : 1;
-	var filters = {};
-	var keys = "firstName email lastName permissions";
-	req.app.db.models.User.pagedFind({
-		filters: filters,
-		keys: keys,
-		limit: req.query.limit,
-		page: req.query.page,
-		sort: req.query.sort
-	}, function (err, results) {
-		if (err) {
-			res.json({ message: "error" });
-			return;
-		}
-		console.log(results);
-		res.json(results);
-	});
-};
-
-module.exports.viewUser = (req, res) => {
-	req.app.db.models.User.findById(req.params.id, function (err, user) {
-		if (err) {
-			console.log("Error", err);
-			res.json({ message: "error" });
-			return
-		}
-		res.json(user);
-	});
-};
-
 
 module.exports.deleteUser = (req, res) => {
 	req.app.db.models.User.findOneAndRemove({ userName: req.params.userName }, function (err, user) {
