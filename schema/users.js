@@ -1,6 +1,5 @@
 'use strict';
 
-
 export const UserSchema = function (app, mongoose) {
 	var UserSchema = new mongoose.Schema({
 		userName: String,
@@ -14,7 +13,6 @@ export const UserSchema = function (app, mongoose) {
 			type: Date,
 			default: Date.now()
 		},
-
 		s3Token: { type: String, default: "" }
 	});
 
@@ -22,6 +20,7 @@ export const UserSchema = function (app, mongoose) {
 	UserSchema.index({
 		username: 1
 	});
+
 	UserSchema.set('autoIndex', (app.get('env') === 'development'));
 
 	UserSchema.methods.validPassword = function (password) {
@@ -29,30 +28,24 @@ export const UserSchema = function (app, mongoose) {
 	};
 
 	UserSchema.pre('save', function (next) {
-		console.log('presave');
-		var user = this;
-		var SALT_FACTOR = 5;
+		let user = this;
+		let SALT_FACTOR = 5;
 
 		if (!user.isModified('password')) return next();
 		app.bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
 			if (err) {
 				return next(err);
 			}
-			console.log('presave1');
 			app.bcrypt.hash(user.password, salt, function (err, hash) {
-				console.log('presave2');
 				if (err) {
 					return next(err);
 				}
 				else {
-
 					user.password = hash;
 					next();
 				}
 			});
 		});
-
-
 	});
 
 	app.db.model('User', UserSchema);
