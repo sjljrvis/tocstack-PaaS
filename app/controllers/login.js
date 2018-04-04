@@ -1,6 +1,6 @@
 import { jwtSecret } from '../../config'
 
-export const loginPage = async(req, res) => {
+export const loginPage = async (req, res) => {
 	try {
 		if (req.body.email && req.body.password) {
 			let user = await (req.app.db.models.User.findOne({ email: req.body.email }))
@@ -14,7 +14,7 @@ export const loginPage = async(req, res) => {
 						email: user.email,
 						userName: user.userName,
 					}
-					let token = req.app.jwt.sign(payload,jwtSecret);
+					let token = req.app.jwt.sign(payload, jwtSecret);
 					res.status(200).json({
 						status: true,
 						// user: req.JWTData,
@@ -53,9 +53,23 @@ module.exports.logout = function (req, res, next) {
 	}
 };
 
-module.exports.permissions = function (req, res, next) {
-	res.json({ message: req.JWTData.permissions })
-};
+export const logout = async (req, res) => {
+	try {
+		let user = await req.app.db.models.User.findOne({ _id: req.JWTData.id });
+		if (user == null) {
+			throw new Error("User with this email-id does not exist")
+		}
+		else {
+			return res.status(200).json({ message: 'Logged out' });
+		}
+	} catch (e) {
+		return res.status(200).json({ status: false, messsage: e.message })
+	}
+}
+
+	module.exports.permissions = function (req, res, next) {
+		res.json({ message: req.JWTData.permissions })
+	};
 
 
 
