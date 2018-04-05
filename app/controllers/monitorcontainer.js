@@ -1,54 +1,48 @@
 import { NGINX_DIRECTORY, NGINX_SITES_ENABLED } from '../../config'
+import fs from "fs"
+import { exec } from "child_process"
 import { read } from 'fs';
-const fs = require('fs')
-var exec = require('child_process').exec;
 
-module.exports.monitorContainer = (req, res) => {
-	let containerName = req.query.containerName;
-	let containerDefault = `${req.query.containerName.split('_')[0]}_default`
-	console.log(req.query.containerName)
-	execute('docker inspect ' + req.query.containerName, (result) => {
-		result = JSON.parse(result);
+
+export const monitorContainer = (req, res) => {
+	let { containerName } = req.query;
+	let containerDefault = `${containerName.split('_')[0]}_default`;
+
+	exec(`docker inspect ${containerName}`, (err, stdout, stderr) => {
+		let result = JSON.parse(stdout);
 		if (result.length > 0) {
 			let _result = [{
 				State: result[0].State,
 				HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
 				NetworkSettings: result[0].NetworkSettings.Networks
-			}
-			]
-			console.log(_result);
+			}]
 			res.status(200).json(_result);
-		}
-		else {
+		} else {
 			let _result = [{
 				State: { Pid: 0 },
 				HostConfig: { ShmSize: 0 },
 				NetworkSettings: { IPAddress: 0, MacAddress: 0 }
-			}
-			]
+			}]
 			res.status(200).json(_result);
 		}
 	})
 }
 
-module.exports.executeCommand = (req, res) => {
-	let containerName = req.body.containerName;
-	let command = req.body.command
-	execute('docker exec ' + containerName + " " + command, (result) => {
-		res.status(200).send(result);
-	})
-
-}
-
-module.exports.viewGitCommits = (req, res) => {
-
-}
-module.exports.fetchLogs = (req, res) => {
-	let appName = req.params.app;
-	execute(`docker logs ${appName}docker_web_1`, (result) => {
-		res.send(result);
+export const executeCommand = (req, res) => {
+	const { containerName, command } = req.body;
+	exec(`docker exec ${containerName} ${command}`, (err, stdout, stderr) => {
+		res.status(200).send(stdout);
 	})
 }
+
+export const fetchLogs = (req, res) => {
+	const { app } = req.params;
+	exec(`docker logs ${app}docker_web_1`, (err, stdout, stderr) => {
+		res.status(200).send(stdout);
+	})
+}
+
+
 module.exports.reloadNginx = (req, res) => {
 	execute('sudo service nginx reload', (result) => {
 		res.send(result);
