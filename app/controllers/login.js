@@ -34,25 +34,6 @@ export const loginPage = async (req, res) => {
 	}
 }
 
-
-module.exports.logout = function (req, res, next) {
-	if (req && req.JWTData) {
-		req.app.db.models.User.findOne({ _id: req.JWTData.id }, (err, user) => {
-			if (err) {
-				return res.status(400).json({ message: 'Please check all fields' });
-			}
-			else if (user == null) {
-				return res.status(401).json({ message: 'User does not exist.' });
-			}
-			else {
-				return res.status(200).json({ message: 'Logged out' });
-			}
-		})
-	} else {
-		return res.status(400).json({ message: 'Please check all fields' });
-	}
-};
-
 export const logout = async (req, res) => {
 	try {
 		let user = await req.app.db.models.User.findOne({ _id: req.JWTData.id });
