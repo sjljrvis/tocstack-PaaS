@@ -1,6 +1,6 @@
 import { jwtSecret } from '../../config'
 
-export const loginPage = async (req, res) => {
+export const loginPage = async (req,res) => {
 	try {
 		if (req.body.email && req.body.password) {
 			let user = await (req.app.db.models.User.findOne({ email: req.body.email }))
@@ -14,7 +14,7 @@ export const loginPage = async (req, res) => {
 						email: user.email,
 						userName: user.userName,
 					}
-					let token = req.app.jwt.sign(payload, jwtSecret);
+					let token = req.app.jwt.sign(payload,jwtSecret);
 					res.status(200).json({
 						status: true,
 						// user: req.JWTData,
@@ -30,11 +30,11 @@ export const loginPage = async (req, res) => {
 		else throw new Error("Email and password is wrong")
 	}
 	catch (e) {
-		return res.status(200).json({ status: false, messsage: e.message })
+		return res.status(200).json({ status: false,messsage: e.message })
 	}
 }
 
-export const logout = async (req, res) => {
+export const logout = async (req,res) => {
 	try {
 		let user = await req.app.db.models.User.findOne({ _id: req.JWTData.id });
 		if (user == null) {
@@ -44,11 +44,11 @@ export const logout = async (req, res) => {
 			return res.status(200).json({ message: 'Logged out' });
 		}
 	} catch (e) {
-		return res.status(200).json({ status: false, messsage: e.message })
+		return res.status(200).json({ status: false,messsage: e.message })
 	}
 }
 
-export const permissions = (req, res) => {
+export const permissions = (req,res) => {
 	res.json({ message: req.JWTData.permissions })
 };
 
