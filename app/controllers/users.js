@@ -67,8 +67,7 @@ export const addUser = async (req,res) => {
 };
 
 
-module.exports.editUser = (req,res) => {
-
+export const editUser = (req,res) => {
 	var user = {
 		$set: {
 			password: "",
@@ -76,99 +75,85 @@ module.exports.editUser = (req,res) => {
 			s3Token: ""
 		}
 	};
-	if (req.body.password) {
-		req.app.db.models.User.findOne({ userName: req.body.userName },(err,userData) => {
-			if (err) {
-				res.json({ "message": "error" });
-				return;
-			}
-			else {
-				if (userData.validPassword(req.body.oldPassword)) {
-					var SALT_FACTOR = 5;
-					req.app.bcrypt.genSalt(SALT_FACTOR,(err,salt) => {
-						if (err) {
-							res.json({ "message": "error" });
-							return
-						}
+	try {
+		if (req.body.password) {
+			let userData = await(req.app.db.models.User.findOne({ userName: req.body.userName }));
+			if (userData.validPassword(req.body.oldPassword)) {
+				let SALT_FACTOR = 5;
+				req.app.bcrypt.genSalt(SALT_FACTOR,(err,salt) => {
+					if (err) throw new Error(err)
+					else {
 						req.app.bcrypt.hash(req.body.password,salt,(err,hash) => {
-							if (err) {
-								res.json({ "message": "error" });
-								return
-							}
+							if (err) throw new Error(err)
 							let encrypted = cipher.update(JSON.stringify({ userName: user.userName + Date.now() }),'utf8','hex');
 							encrypted += cipher.final('hex');
-							console.log(encrypted);
 							userData.s3Token = encrypted;
 							userData.password = hash;
 							userData.confirmPassword = hash;
 							userData.save();
 							res.json({ status: true,message: "Password updated" });
 						});
-					});
-					let passwordData = `${req.body.userName}:${md5(req.body.password)}`
-					fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(data) => {
-						if (err) {
-							return;
-						}
+					}
+				})
+				let passwordData = `${req.body.userName}:${md5(req.body.password)}`
+				fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(err) => {
+					if (err) throw new Error(err)
+					exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
+						if (err) throw new Error(err)
 						else {
-							execshell(` sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout) => {
-								if (err) {
-									return;
-								}
-								else {
-									console.log({ status: true,message: "Password file updated" })
-								}
-							})
+							console.log({ status: true,message: "Password file updated" })
 						}
 					})
-				}
-				else {
-					res.json({ status: false,"message": "Old password is incorrect" });
-				}
+				})
+			} else {
+				throw new Error("Old password is incorrect")
 			}
-		});
+		}
+	}
+	catch (e) {
+		return res.json({ status: false,message: e.message })
 	}
 };
 
 
-module.exports.generates3Token = (req,res) => {
-	req.app.db.models.User.findOne({ email: req.JWTData.email },(err,user) => {
+export const generates3Token = async (req,res) => {
+	try {
+		let user = await (req.app.db.models.User.findOne({ email: req.JWTData.email }));
 		if (user) {
-			try {
-				let encrypted = '';
-				cipher.on('readable',() => {
-					const data = cipher.read();
-					if (data) {
-						encrypted = data.toString('hex');
-						user.s3Token = encrypted;
-						user.save();
-					}
-				});
-				console.log({ userName: user.userName + Date.now() })
-				cipher.write(JSON.stringify({ userName: user.userName + Date.now() }))
-				res.status(200).json({ status: true,"message": "Generated token successfully","s3Token": encrypted });
-			}
-			catch (execption) {
-				return res.status(200).json({ status: false,"message": "Sorry ! Could generate Token , Please try after some time" });
-			}
+			let encrypted = '';
+			cipher.on('readable',() => {
+				const data = cipher.read();
+				if (data) {
+					encrypted = data.toString('hex');
+					user.s3Token = encrypted;
+					user.save();
+				}
+			});
+			console.log({ userName: user.userName + Date.now() })
+			cipher.write(JSON.stringify({ userName: user.userName + Date.now() }))
+			res.status(200).json({ status: true,"message": "Generated token successfully","s3Token": encrypted });
 		}
 		else {
-			return res.status(200).json({ status: false,"message": "Invalid user" });
+			throw new Error("Invalid user")
 		}
-	});
+	}
+	catch (e) {
+		return res.json({ status: false,message: e.message })
+	}
 }
 
 
-module.exports.shows3Token = (req,res) => {
-	req.app.db.models.User.findOne({ email: req.JWTData.email },(err,user) => {
-		if (err) {
-			return res.status(200).json({ status: false,"message": "Error occured Please try again","s3Token": "" });
-		}
+export const shows3Token = async (req,res) => {
+	try {
+		const user = await (req.app.db.models.User.findOne({ email: req.JWTData.email }));
 		if (user) {
 			return res.status(200).json({ status: true,"message": "Generated token successfully","s3Token": user.s3Token });
 		}
 		else {
-			return res.status(200).json({ status: false,"message": "Invalid user" });
+			throw new Error("Invalid user")
 		}
-	});
+	}
+	catch (e) {
+		return res.json({ status: false,message: e.message,s3Token: "" })
+	}
 }
