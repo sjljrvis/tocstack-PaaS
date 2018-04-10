@@ -1,11 +1,11 @@
 import { decodeToken } from '../../middleware/decodeJWT'
+import { addUser,editUser,deleteUser,generates3Token,shows3Token } from '../controllers/users'
 export const userRoute = (app) => {
 
-
-	app.put('/admin/user',require(__base + '/app/controllers/users.js').addUser);
-	app.post('/admin/user',require(__base + '/app/controllers/users.js').editUser);
-	app.post('/admin/deleteuser/:userName',require(__base + '/app/controllers/users.js').deleteUser);
-	app.post('/admin/generatetoken',decodeToken,require(__base + '/app/controllers/users.js').generates3Token);
-	app.post('/admin/showtoken',decodeToken,require(__base + '/app/controllers/users.js').shows3Token);
+	app.put('/admin/user',addUser);
+	app.post('/admin/user',editUser);
+	app.post('/admin/deleteuser/:userName',deleteUser);
+	app.post('/admin/generatetoken',decodeToken,generates3Token);
+	app.post('/admin/showtoken',decodeToken,shows3Token);
 
 };
