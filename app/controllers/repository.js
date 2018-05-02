@@ -1,5 +1,5 @@
 const fs = require('fs')
-var exec = require('child_process').exec;
+const { exec,execSync } = require('child_process');
 import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
 import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
@@ -13,36 +13,33 @@ export const createRepository = async (req,res) => {
 		let language = req.body.language || "nodeJS";
 
 		try {
-			exec(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`,(err,stdout,stderr) => {
-				if (err) throw new Error(err)
+			execSync(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`)
+			if (err) throw new Error(err)
+			else {
+				let repository = await (req.app.db.models.Repository.findOne({ repositoryName: repositoryName }))
+				if (repository) throw new Error('Repository already exists please choose another name')
 				else {
-					let repository = await(req.app.db.models.Repository.findOne({ repositoryName: repositoryName }))
-					if (repository) throw new Error('Repository already exists please choose another name')
-					else {
-						const repoPath = rootDirectory + userName + '/' + repositoryName;
-						exec('git init --bare ' + repoPath,(err,stderr,stdout) => {
-							fs.writeFileSync(repoPath + "/calldocker.js",fs.readFileSync(`${callDockerPath}/calldocker.js`));
-							fs.writeFileSync(repoPath + "/hooks/post-receive",fs.readFileSync(`${shellScriptPath}/post-receive`));
-							fs.writeFileSync(repoPath + "/hooks/pre-receive",fs.readFileSync(`${shellScriptPath}/pre-receive`));
-							fs.writeFileSync(repoPath + "/containerName.txt",fs.readFileSync(`${shellScriptPath}/containerName.txt`));
-							exec(`chmod +x  ${repoPath + '/hooks/pre-receive'} && chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`,(error,stdout,stderr) => {
-								let repositoryData = {
-									repositoryName: repositoryName,
-									userName: userName,
-									path: repoPath,
-									pathDocker: repoPath + '_docker',
-									language: language
-								}
-								let result = await(req.app.db.models.Repository.create(repositoryData));
-								res.json({ status: 'true',message: 'Repository created successfully' });
-								updateDigitalocean(repositoryName,(err,result) => {
-									if (err) console.log("DO error",err);
-								})
-							});
-						});
-					};
+					const repoPath = rootDirectory + userName + '/' + repositoryName;
+					execSync('git init --bare ' + repoPath);
+					fs.writeFileSync(repoPath + "/calldocker.js",fs.readFileSync(`${callDockerPath}/calldocker.js`));
+					fs.writeFileSync(repoPath + "/hooks/post-receive",fs.readFileSync(`${shellScriptPath}/post-receive`));
+					fs.writeFileSync(repoPath + "/hooks/pre-receive",fs.readFileSync(`${shellScriptPath}/pre-receive`));
+					fs.writeFileSync(repoPath + "/containerName.txt",fs.readFileSync(`${shellScriptPath}/containerName.txt`));
+					execSync(`chmod +x  ${repoPath + '/hooks/pre-receive'} && chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`);
+					let repositoryData = {
+						repositoryName: repositoryName,
+						userName: userName,
+						path: repoPath,
+						pathDocker: repoPath + '_docker',
+						language: language
+					}
+					let result = await (req.app.db.models.Repository.create(repositoryData));
+					res.json({ status: 'true',message: 'Repository created successfully' });
+					updateDigitalocean(repositoryName,(err,result) => {
+						if (err) console.log("DO error",err);
+					});
 				};
-			});
+			};
 		} catch (err) {
 			if (err.code !== 'EEXIST') res.json({ status: 'false',message: 'Repository already exists please choose another name' })
 			else {
@@ -82,10 +79,10 @@ export const deleteRepository = async (req,res) => {
 	}
 }
 
-export const getAllRepositories = (req,res) => {
+export const getAllRepositories = async (req,res) => {
 	try {
 		if (!req.JWTData) throw new Error("Invalid user")
-		let result = await(req.app.db.models.Repository.find({ "userName": req.JWTData.userName }));
+		let result = await (req.app.db.models.Repository.find({ "userName": req.JWTData.userName }));
 		if (result) {
 			res.status(200).json(result);
 		}

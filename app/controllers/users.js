@@ -67,7 +67,7 @@ export const addUser = async (req,res) => {
 };
 
 
-export const editUser = (req,res) => {
+export const editUser = async (req,res) => {
 	var user = {
 		$set: {
 			password: "",
@@ -77,7 +77,7 @@ export const editUser = (req,res) => {
 	};
 	try {
 		if (req.body.password) {
-			let userData = await(req.app.db.models.User.findOne({ userName: req.body.userName }));
+			let userData = await (req.app.db.models.User.findOne({ userName: req.body.userName }));
 			if (userData.validPassword(req.body.oldPassword)) {
 				let SALT_FACTOR = 5;
 				req.app.bcrypt.genSalt(SALT_FACTOR,(err,salt) => {
