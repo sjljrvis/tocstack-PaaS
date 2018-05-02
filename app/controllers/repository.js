@@ -36,7 +36,7 @@ export const createRepository = async (req,res) => {
 					let result = await (req.app.db.models.Repository.create(repositoryData));
 					res.json({ status: 'true',message: 'Repository created successfully' });
 					updateDigitalocean(repositoryName,(err,result) => {
-						if (err) console.log("DO error",err);
+						if (err) log.error("DO error",err);
 					});
 				};
 			};
@@ -66,13 +66,13 @@ export const deleteRepository = async (req,res) => {
 			res.json({ status: true,message: "Deleted" })
 		})
 		exec(`docker stop ${repositoryName}docker_web_1 && docker rm ${repositoryName}docker_web_1 && docker stop ${repositoryName}docker_web`,(err,stdout,stderr) => {
-			console.log("Container deleted")
+			log.info("Stopping running container");
 		});
 		exec(`rm ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com && rm ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`,(err,stdout,stderr) => {
-			console.log("Container deleted")
+			log.info("Deleting Container");
 		});
 		deleteDigitalOcean(repositoryName,(err,body) => {
-			if (err) console.log({ status: false,message: " Unable to delete record" })
+			if (err) log.info({ status: false,message: " Unable to delete record" })
 		})
 	} catch (e) {
 		res.json({ status: 'false',message: e.message })
@@ -170,7 +170,7 @@ let makeRequestToDigitalOcean = (method,repositoryName,recordId,callback) => {
 	}
 	request(options,(error,response,body) => {
 		if (error) {
-			console.log("Error",error);
+			log.error("Error in Digital Ocean api",error);
 			return;
 		}
 		callback(null,body)

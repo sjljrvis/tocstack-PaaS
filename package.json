@@ -19,6 +19,8 @@
     "babel": "^6.23.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.2",
+    "bunyan": "^1.8.12",
+    "bunyan-format": "^0.2.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "dev": "^0.1.3",
