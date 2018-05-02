@@ -101,7 +101,7 @@ export const editUser = async (req,res) => {
 					exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
 						if (err) throw new Error(err)
 						else {
-							console.log({ status: true,message: "Password file updated" })
+							log.info({ status: true,message: "Password file updated" })
 						}
 					})
 				})
@@ -129,7 +129,7 @@ export const generates3Token = async (req,res) => {
 					user.save();
 				}
 			});
-			console.log({ userName: user.userName + Date.now() })
+			log.info({ userName: user.userName + Date.now() })
 			cipher.write(JSON.stringify({ userName: user.userName + Date.now() }))
 			res.status(200).json({ status: true,"message": "Generated token successfully","s3Token": encrypted });
 		}

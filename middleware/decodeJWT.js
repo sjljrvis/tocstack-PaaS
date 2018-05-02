@@ -1,7 +1,7 @@
 
-module.exports.decodeToken = (req, res, next) => {
+module.exports.decodeToken = (req,res,next) => {
 	if (!req.get('Authorization')) {
-		console.log("error")
+		log.error(new Error("Authorization header not found"));
 		res.status(401).json({ message: "You are not Authorized" });
 		return;
 	}
