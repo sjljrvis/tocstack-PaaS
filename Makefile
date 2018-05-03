@@ -8,16 +8,21 @@
 run: clean
 	node index.js
 
-deploy:
-	@echo "Deploying server to cloud"
-
-test:clean
-	@echo "Testing server api"
-
 clean:
 	@echo "\n -> Cleaning cache and log files\n" 
 	-find . -name 'nohup.out' -delete
 	@echo "\n -> Cleaning done\n"
+
+deploy:
+	@echo "Deploying server to cloud"
+
+run-background:clean 
+	nohup node index.js &
+
+
+test:clean background
+	@echo "Testing server api"
+	./node_modules/mocha/bin/mocha
 
 help:
 	@echo "\nPlease call with one of these targets:\n"
