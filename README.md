@@ -60,7 +60,6 @@ tocstack apps  // this will list down all the apps for particular user
 
 ## Future upgrades
 
-* Any online application hosted on tocstack will have a subdomain linked to it
 * Database-container hosting (mongoDB and Postgre SQL)
 * SSL for all deployed applications
 
