@@ -9,8 +9,9 @@ let should = chai.should();
 chai.use(chaiHttp);
 //Our parent block
 var assert = require('assert');
+
 describe('/GET book',() => {
-  it('it should GET all the books',(done) => {
+  it('it should return true ',(done) => {
     chai.request('http://localhost:5555')
       .get('/auth/user')
       .end((err,res) => {

@@ -20,7 +20,7 @@ run-background:clean
 	nohup node index.js &
 
 
-test:clean background
+test:clean run-background
 	@echo "Testing server api"
 	./node_modules/mocha/bin/mocha
 
