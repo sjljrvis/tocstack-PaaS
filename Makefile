@@ -24,6 +24,9 @@ test:clean background
 	@echo "Testing server api"
 	./node_modules/mocha/bin/mocha
 
+deploy: clean
+	pm2 start index.js --name api
+
 help:
 	@echo "\nPlease call with one of these targets:\n"
 	@$(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F:\
