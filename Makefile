@@ -13,19 +13,21 @@ clean:
 	-find . -name 'nohup.out' -delete
 	@echo "\n -> Cleaning done\n"
 
-deploy:
-	@echo "Deploying server to cloud"
+deploy: clean delete
+	pm2 start index.js --name api
+stop :
+	pm2 stop api
+delete : 
+	pm2 delete api
+restart	:
+	pm2 reload api
 
 run-background:clean 
 	nohup node index.js &
 
-
 test:clean run-background
 	@echo "Testing server api"
 	./node_modules/mocha/bin/mocha
-
-deploy: clean
-	pm2 start index.js --name api
 
 help:
 	@echo "\nPlease call with one of these targets:\n"
