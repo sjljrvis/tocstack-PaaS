@@ -6,7 +6,7 @@
   "script": "/root/PaaS",
   "exec_interpreter": "babel-node",
   "scripts": {
-    "test": "mocha --compilers js:babel/register",
+    "test": "make test",
     "dev": "nodemon index.js",
     "start": "nodemon index.js --exec babel-node --presets es2015,stage-2"
   },
