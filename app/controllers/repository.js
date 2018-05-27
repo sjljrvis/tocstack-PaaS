@@ -5,10 +5,12 @@ import { rootDirectory } from '../helper/constant'
 import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
 import request from 'request'
 
+
 export const createRepository = async (req,res) => {
 
 	if (req.JWTData) {
 		let userName = req.JWTData.userName;
+		let userId = req.JWTData.userId;
 		let repositoryName = req.body.repositoryName;
 		let language = req.body.language || "nodeJS";
 
@@ -29,6 +31,7 @@ export const createRepository = async (req,res) => {
 					let repositoryData = {
 						repositoryName: repositoryName,
 						userName: userName,
+						userId: userId,
 						path: repoPath,
 						pathDocker: repoPath + '_docker',
 						language: language
@@ -51,6 +54,7 @@ export const createRepository = async (req,res) => {
 		res.status(403).json("invalid Credentials")
 	}
 }
+
 
 
 

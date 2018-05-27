@@ -63,4 +63,3 @@ process.on('SIGINT',() => {
 	log.info("Shutting down server");
 	process.exit(0)
 });
-

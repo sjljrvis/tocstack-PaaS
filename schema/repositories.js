@@ -1,10 +1,14 @@
 'use strict';
 
-export const RepositorySchema = function (app, mongoose) {
+export const RepositorySchema = function (app,mongoose) {
 	var RepositorySchema = new mongoose.Schema({
 
 		repositoryName: String,
 		userName: String,
+		userId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User'
+		},
 		language: {
 			type: String,
 			default: 'nodeJS'
@@ -19,11 +23,11 @@ export const RepositorySchema = function (app, mongoose) {
 			type: Date,
 			default: Date.now()
 		},
-		isDeployed: { type: Boolean, default: false }
+		isDeployed: { type: Boolean,default: false }
 
 	});
 
 	RepositorySchema.plugin(require('./plugins/pagedFind'));
-	app.db.model('Repository', RepositorySchema);
+	app.db.model('Repository',RepositorySchema);
 
 };

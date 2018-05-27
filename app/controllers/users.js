@@ -12,6 +12,17 @@ const cipher = crypto.createCipher('aes192',hashSecret);
 *  do check it before testing with frontend integration
 */
 
+export const getUserInfo = async (req,res) => {
+	try {
+		let { userName } = req.params;
+		let repository = await (req.app.db.models.Repository.find({ userName: userName }).populate('userId'));
+		res.json({ status: true,data: repository })
+	}
+	catch (e) {
+		return res.json({ status: false,message: e.message })
+	}
+}
+
 export const deleteUser = async (req,res) => {
 	try {
 		let user = await (req.app.db.models.User.findOneAndRemove({ userName: req.params.userName }));
@@ -68,15 +79,15 @@ export const addUser = async (req,res) => {
 
 
 export const editUser = async (req,res) => {
-	var user = {
-		$set: {
-			password: "",
-			confirmPassword: "",
-			s3Token: ""
-		}
-	};
 	try {
 		if (req.body.password) {
+			let user = {
+				$set: {
+					password: "",
+					confirmPassword: "",
+					s3Token: ""
+				}
+			};
 			let userData = await (req.app.db.models.User.findOne({ userName: req.body.userName }));
 			if (userData.validPassword(req.body.oldPassword)) {
 				let SALT_FACTOR = 5;
@@ -108,6 +119,13 @@ export const editUser = async (req,res) => {
 			} else {
 				throw new Error("Old password is incorrect")
 			}
+		}
+		else {
+			let { description } = req.body;
+			let userData = await (req.app.db.models.User.findOne({ _id: req.JWTData.id }));
+			userData.description = description;
+			userData.save();
+			res.json({ status: true,message: "Info updated" });
 		}
 	}
 	catch (e) {
