@@ -7,7 +7,8 @@
 
 run: clean
 	node index.js
-
+dev : clean
+	nodemon index.js
 clean:
 	@echo "\n -> Cleaning cache and log files\n" 
 	-find . -name 'nohup.out' -delete

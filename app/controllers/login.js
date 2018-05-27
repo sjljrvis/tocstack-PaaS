@@ -34,6 +34,8 @@ export const loginPage = async (req,res) => {
 	}
 }
 
+
+
 export const logout = async (req,res) => {
 	try {
 		let user = await req.app.db.models.User.findOne({ _id: req.JWTData.id });

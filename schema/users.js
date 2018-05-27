@@ -9,6 +9,8 @@ export const UserSchema = function (app,mongoose) {
 		phoneNumber: String,
 		firstName: String,
 		lastName: String,
+		description: { type: String,default: "" },
+		organization: [],
 		date: {
 			type: Date,
 			default: Date.now()
