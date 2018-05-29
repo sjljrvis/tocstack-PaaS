@@ -30,7 +30,7 @@ export const loginPage = async (req,res) => {
 		else throw new Error("Email and password is wrong")
 	}
 	catch (e) {
-		return res.status(200).json({ status: false,messsage: e.message })
+		return res.status(200).json({ status: false,message: e.message })
 	}
 }
 
@@ -46,7 +46,7 @@ export const logout = async (req,res) => {
 			return res.status(200).json({ message: 'Logged out' });
 		}
 	} catch (e) {
-		return res.status(200).json({ status: false,messsage: e.message })
+		return res.status(200).json({ status: false,message: e.message })
 	}
 }
 

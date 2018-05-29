@@ -88,7 +88,7 @@ export const getAllRepositories = async (req,res) => {
 		if (!req.JWTData) throw new Error("Invalid user")
 		let result = await (req.app.db.models.Repository.find({ "userName": req.JWTData.userName }));
 		if (result) {
-			res.status(200).json(result);
+			res.status(200).json({ status: true,repositories: result });
 		}
 	} catch (e) {
 		res.json({ status: 'false',message: e.message })
