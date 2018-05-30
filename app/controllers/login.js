@@ -1,6 +1,7 @@
 import { jwtSecret } from '../../config'
 
 export const loginPage = async (req,res) => {
+	console.log("I m here")
 	try {
 		if (req.body.email && req.body.password) {
 			let user = await (req.app.db.models.User.findOne({ email: req.body.email }))
