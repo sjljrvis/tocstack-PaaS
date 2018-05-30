@@ -85,13 +85,16 @@ export const deleteRepository = async (req,res) => {
 
 export const getAllRepositories = async (req,res) => {
 	try {
-		if (!req.JWTData) throw new Error("Invalid user")
-		let result = await (req.app.db.models.Repository.find({ "userName": req.JWTData.userName }));
-		if (result) {
-			res.status(200).json({ status: true,repositories: result });
+		if (!req.JWTData) {
+			throw new Error("Invalid user")
+		} else {
+			let result = await (req.app.db.models.Repository.find({ "userName": req.JWTData.userName }));
+			if (result) {
+				res.status(200).json({ status: true,repositories: result });
+			}
 		}
 	} catch (e) {
-		res.json({ status: 'false',message: e.message })
+		res.json({ status: false,message: e.message })
 	}
 }
 

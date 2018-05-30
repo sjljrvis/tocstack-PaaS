@@ -17,16 +17,16 @@ export const monitorContainer = (req,res) => {
           NetworkSettings: result[0].NetworkSettings.Networks
         }
       ];
-      res.status(200).json(_result);
+      res.status(200).json({ status: true,info: _result })
     } else {
       let _result = [
         {
           State: { Pid: 0 },
           HostConfig: { ShmSize: 0 },
-          NetworkSettings: { IPAddress: 0,MacAddress: 0 }
+          NetworkSettings: { IPAddress: "0.0.0.0",MacAddress: "00:50:56:3F:FF:FF" }
         }
       ];
-      res.status(200).json(_result);
+      res.status(200).json({ status: true,info: _result });
     }
   });
 };
@@ -40,8 +40,8 @@ export const executeCommand = (req,res) => {
 
 export const fetchLogs = (req,res) => {
   const { app } = req.params;
-  exec(`docker logs ${app}docker_web_1`,(err,stdout,stderr) => {
-    res.status(200).send(stdout);
+  exec(`docker logs ${app} --timestamps`,(err,stdout,stderr) => { //docker_web_1
+    res.status(200).json({ status: true,logs: stdout.split("\n") })
   });
 };
 
