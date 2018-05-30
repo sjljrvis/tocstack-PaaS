@@ -11,6 +11,8 @@ import cors from "cors";
 import { port,mongodb } from './config';
 import bunyan from 'bunyan';
 import bunyanFormat from 'bunyan-format';
+import http from 'http';
+import webSocket from 'ws';
 
 /*
 * Logger
@@ -27,6 +29,10 @@ global.log = log;
 
 
 const app = express();
+const server = http.createServer(app);
+const wss = new webSocket.Server({
+	server
+});
 
 app.use(cors());
 app.use(cookieParser('LOL-my-Secret-dam'));
@@ -50,7 +56,16 @@ models(app,mongoose);
 import { indexRoute } from './app/routes';
 indexRoute(app);
 
-app.listen(port,() => {
+global.userSocket = {};
+wss.on('connection',function connection(ws,req) {
+	let userId = req.url.split('/')[1];
+	userSocket[userId] = ws;
+	log.info(userId,"is online");
+	userSocket[userId].send("ping");
+});
+
+
+server.listen(port,() => {
 	log.info("Starting server")
 	log.info("Port used",port)
 	log.info(`Listening at http://127.0.0.1:${port}`);
