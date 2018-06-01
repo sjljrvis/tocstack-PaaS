@@ -16,34 +16,32 @@ export const createRepository = async (req,res) => {
 
 		try {
 			execSync(`cd && cd ${rootDirectory + userName} && sudo -u www-data mkdir ${repositoryName}`)
-			if (err) throw new Error(err)
+			let repository = await (req.app.db.models.Repository.findOne({ repositoryName: repositoryName }))
+			if (repository) throw new Error('Repository already exists please choose another name')
 			else {
-				let repository = await (req.app.db.models.Repository.findOne({ repositoryName: repositoryName }))
-				if (repository) throw new Error('Repository already exists please choose another name')
-				else {
-					const repoPath = rootDirectory + userName + '/' + repositoryName;
-					execSync('git init --bare ' + repoPath);
-					fs.writeFileSync(repoPath + "/calldocker.js",fs.readFileSync(`${callDockerPath}/calldocker.js`));
-					fs.writeFileSync(repoPath + "/hooks/post-receive",fs.readFileSync(`${shellScriptPath}/post-receive`));
-					fs.writeFileSync(repoPath + "/hooks/pre-receive",fs.readFileSync(`${shellScriptPath}/pre-receive`));
-					fs.writeFileSync(repoPath + "/containerName.txt",fs.readFileSync(`${shellScriptPath}/containerName.txt`));
-					execSync(`chmod +x  ${repoPath + '/hooks/pre-receive'} && chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`);
-					let repositoryData = {
-						repositoryName: repositoryName,
-						userName: userName,
-						userId: userId,
-						path: repoPath,
-						pathDocker: repoPath + '_docker',
-						language: language
-					}
-					let result = await (req.app.db.models.Repository.create(repositoryData));
-					res.json({ status: 'true',message: 'Repository created successfully' });
-					updateDigitalocean(repositoryName,(err,result) => {
-						if (err) log.error("DO error",err);
-					});
-				};
+				const repoPath = rootDirectory + userName + '/' + repositoryName;
+				execSync('git init --bare ' + repoPath);
+				fs.writeFileSync(repoPath + "/calldocker.js",fs.readFileSync(`${callDockerPath}/calldocker.js`));
+				fs.writeFileSync(repoPath + "/hooks/post-receive",fs.readFileSync(`${shellScriptPath}/post-receive`));
+				fs.writeFileSync(repoPath + "/hooks/pre-receive",fs.readFileSync(`${shellScriptPath}/pre-receive`));
+				fs.writeFileSync(repoPath + "/containerName.txt",fs.readFileSync(`${shellScriptPath}/containerName.txt`));
+				execSync(`chmod +x  ${repoPath + '/hooks/pre-receive'} && chmod +x  ${repoPath + '/hooks/post-receive'} && chown www-data:www-data -R ${rootDirectory + userName} && chown www-data:www-data -R ${rootDirectory + userName + '/' + repositoryName} && sudo service nginx reload`);
+				let repositoryData = {
+					repositoryName: repositoryName,
+					userName: userName,
+					userId: userId,
+					path: repoPath,
+					pathDocker: repoPath + '_docker',
+					language: language
+				}
+				let result = await (req.app.db.models.Repository.create(repositoryData));
+				res.json({ status: 'true',message: 'Repository created successfully' });
+				updateDigitalocean(repositoryName,(err,result) => {
+					if (err) log.error("DO error",err);
+				});
 			};
 		} catch (err) {
+			console.log(err)
 			if (err.code !== 'EEXIST') res.json({ status: 'false',message: 'Repository already exists please choose another name' })
 			else {
 				res.json({ status: 'false',message: e.message })

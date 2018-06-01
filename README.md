@@ -1,5 +1,5 @@
 ## tocstack - **PaaS** for fast application development
-[![Build Status](https://travis-ci.org/sjljrvis/PaaS.svg?branch=master)](https://travis-ci.org/sjljrvis/PaaS)
+[![Build Status](https://travis-ci.org/sjljrvis/tocstack-PaaS.svg?branch=master)](https://travis-ci.org/sjljrvis//tocstack-PaaS)
 
 
 Deploy your web-applications,REST-api, micro-services seamlessly with **tocstack**.
