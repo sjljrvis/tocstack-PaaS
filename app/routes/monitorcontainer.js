@@ -1,11 +1,12 @@
 import { decodeToken } from '../../middleware/decodeJWT'
-import { monitorContainer,fetchLogs,executeCommand,reloadNginx,createNginx,updateNginx } from '../controllers/monitorcontainer'
+import { monitorContainer,fetchLogs,executeCommand,reloadNginx,createNginx_API,updateNginx_API,rebuildContainer } from '../controllers/monitorcontainer'
 
 export const monitorcontainerRoute = (app) => {
 	app.get('/monitorcontainer',decodeToken,monitorContainer);
 	app.get('/fetchlogs/:app',decodeToken,fetchLogs);
 	app.post('/executecommand',decodeToken,executeCommand);
 	app.get('/reloadnginx',reloadNginx);
-	app.post('/createnginx',createNginx);
-	app.post('/updatenginx',updateNginx)
+	app.post('/createnginx',createNginx_API);
+	app.post('/updatenginx',updateNginx_API);
+	app.post('/rebuildcontainer',rebuildContainer)
 };

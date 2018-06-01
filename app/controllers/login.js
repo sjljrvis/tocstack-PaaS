@@ -1,7 +1,6 @@
 import { jwtSecret } from '../../config'
 
 export const loginPage = async (req,res) => {
-	console.log("I m here")
 	try {
 		if (req.body.email && req.body.password) {
 			let user = await (req.app.db.models.User.findOne({ email: req.body.email }))
@@ -18,7 +17,7 @@ export const loginPage = async (req,res) => {
 					let token = req.app.jwt.sign(payload,jwtSecret);
 					res.status(200).json({
 						status: true,
-						// user: req.JWTData,
+						userId: payload.id,
 						userName: payload.userName,
 						email: payload.email,
 						message: 'Success',
