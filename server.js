@@ -74,9 +74,11 @@ process.on('SIGINT',() => {
 });
 
 wss.on('connection',function connection(ws,req) {
-	let userId = req.url.split('/')[1];
+	let userName = req.url.split('/')[1]
+	let userId = req.url.split('/')[2];
 	userSocket[userId] = ws;
-	log.info(userId,"is online");
+	userSocket[userId][userName] = userName;
+	log.info(userSocket[userId][userName],"is online");
 	userSocket[userId].send(JSON.stringify({ message: "handshake",type: "ping" }));
 
 	userSocket[userId].on('message',function incoming(data) {
@@ -87,6 +89,7 @@ wss.on('connection',function connection(ws,req) {
 
 			case "disconnect":
 				userSocket[userId].terminate(() => {
+					delete userSocket[userId]
 					log.info(`${userId} went offline`)
 				})
 				break;
@@ -96,9 +99,8 @@ wss.on('connection',function connection(ws,req) {
 	});
 
 	userSocket[userId].on("close",() => {
+		log.info(`${userSocket[userId][userName]} went offline`)
 		delete userSocket[userId]
-		log.info(`${userId} went offline`)
-		console.log(Object.keys(userSocket))
 	})
 
 });
