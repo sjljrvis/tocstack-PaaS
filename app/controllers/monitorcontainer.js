@@ -1,4 +1,4 @@
-import { NGINX_DIRECTORY,NGINX_SITES_ENABLED } from "../../config";
+import { NGINX_DIRECTORY,NGINX_SITES_ENABLED,shellScriptPath } from "../../config";
 import fs from "fs";
 import { exec,spawn } from "child_process";
 import { read } from "fs";
@@ -70,7 +70,7 @@ export const rebuildContainer = (req,res) => {
      }
     }`;
 
-    const task = spawn("sh",[`./scripts/updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
+    const task = spawn("sh",[`${shellScriptPath}/updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
 
     task.stderr.on('data',(err) => {
       console.log(err.toString())
