@@ -26,6 +26,7 @@ const log = bunyan.createLogger({ name: 'app',stream: formatOut,level: 'debug' }
 
 global.__base = __dirname;
 global.log = log;
+global.userSocket = {};
 
 
 const app = express();
@@ -56,13 +57,6 @@ models(app,mongoose);
 import { indexRoute } from './app/routes';
 indexRoute(app);
 
-global.userSocket = {};
-wss.on('connection',function connection(ws,req) {
-	let userId = req.url.split('/')[1];
-	userSocket[userId] = ws;
-	log.info(userId,"is online");
-	userSocket[userId].send("ping");
-});
 
 
 server.listen(port,() => {
@@ -77,4 +71,34 @@ process.on('SIGINT',() => {
 	log.info("Stoping api service");
 	log.info("Shutting down server");
 	process.exit(0)
+});
+
+wss.on('connection',function connection(ws,req) {
+	let userId = req.url.split('/')[1];
+	userSocket[userId] = ws;
+	log.info(userId,"is online");
+	userSocket[userId].send(JSON.stringify({ message: "handshake",type: "ping" }));
+
+	userSocket[userId].on('message',function incoming(data) {
+		let msg = JSON.parse(data);
+		switch (msg.type) {
+			case "pong": log.info(`${userSocket[userId]} send ${msg.message}`)
+				break;
+
+			case "disconnect":
+				userSocket[userId].terminate(() => {
+					log.info(`${userId} went offline`)
+				})
+				break;
+			default:
+				log.info("Invalid socket msg")
+		}
+	});
+
+	userSocket[userId].on("close",() => {
+		delete userSocket[userId]
+		log.info(`${userId} went offline`)
+		console.log(Object.keys(userSocket))
+	})
+
 });
