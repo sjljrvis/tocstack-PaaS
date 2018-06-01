@@ -54,8 +54,10 @@ export const reloadNginx = (req,res) => {
 
 
 export const rebuildContainer = (req,res) => {
+  let PORT;
   const { repositoryName,projectPath } = req.body
   portfinder.getPort((err,port) => {
+    PORT = port;
     let nginx = ` server {
       listen 80; 
       server_name ${repositoryName}.tocstack.com;
