@@ -82,14 +82,13 @@ export const rebuildContainer = (req,res) => {
     })
 
     task.on('exit',function () {
-      console.log('App running on port :',PORT)
-      console.log(`Checkout your app ${repositoryName}.tocstack.com:${PORT}`);
-      // updateNginx(repositoryName,nginx,(err,data) => {
-      //   if (err) {
-      //     console.log(err)
-      //   }
-      //   else console.log(data)
-      // })
+      console.log(`Checkout your app ${repositoryName}.tocstack.com`);
+      updateNginx(repositoryName,nginx,(err,data) => {
+        if (err) {
+          console.log(err)
+        }
+        else console.log(data)
+      })
     });
 
   });
