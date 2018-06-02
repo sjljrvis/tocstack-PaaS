@@ -76,7 +76,7 @@ export const rebuildContainer = (req,res) => {
 
     task.stderr.on('data',(err) => {
       console.log(err.toString())
-      userSocket[id].send(JSON.stringify({ message: err.toString(),type: "logs" }))
+      userSocket[id].send(JSON.stringify({ message: err.toString('utf-8'),type: "logs" }))
     })
 
     task.stdout.on('data',(data) => {
