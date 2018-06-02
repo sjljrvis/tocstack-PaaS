@@ -41,7 +41,7 @@ export const executeCommand = (req,res) => {
 
 export const fetchLogs = (req,res) => {
   const { app } = req.params;
-  exec(`docker logs ${app} --timestamps`,(err,stdout,stderr) => { //docker_web_1
+  exec(`docker logs --timestamps ${app} `,(err,stdout,stderr) => { //docker_web_1
     res.status(200).json({ status: true,logs: stdout.split("\n") })
   });
 };
