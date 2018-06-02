@@ -59,6 +59,9 @@ export const rebuildContainer = (req,res) => {
   const { id } = req.JWTData;
 
   console.log(req.JWTData);
+  console.log(">>>>>>>>>>>>>>>>")
+  console.log(userSocket)
+  console.log(">>>>>>>>>>>>>>>>")
   console.log(Object.keys(userSocket));
 
   portfinder.getPort((err,port) => {
