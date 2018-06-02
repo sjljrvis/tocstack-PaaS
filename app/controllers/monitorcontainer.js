@@ -101,10 +101,11 @@ export const rebuildContainer = (req,res) => {
 const updateNginx = (repositoryName,nginx,callback) => {
   try {
     fs.writeFile(`${NGINX_DIRECTORY}/${repositoryName}.tocstack.com`,nginx,(err,data) => {
-      if (err) throw new Error("Error while creating nginx config");
+      if (err) { throw new Error("Error while creating nginx config"); }
       else {
         exec(`ln -s ${NGINX_DIRECTORY}/${repositoryName}.tocstack.com ${NGINX_SITES_ENABLED}/${repositoryName}.tocstack.com && sudo service nginx reload`,(err,stderr,stdout) => {
-          if (err) throw new Error("Error while linking nginx config");
+          console.log(err)
+          if (err) { throw new Error("Error while linking nginx config"); }
           else {
             callback(null,"app deployed")
           }
