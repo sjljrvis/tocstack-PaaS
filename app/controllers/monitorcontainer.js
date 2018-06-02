@@ -70,7 +70,6 @@ export const rebuildContainer = (req,res) => {
      }
     }`;
 
-    console.log(`${projectPath}_docker`);
     const task = spawn("sh",[`updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
 
     task.stderr.on('data',(err) => {
