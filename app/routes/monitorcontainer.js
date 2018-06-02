@@ -8,5 +8,5 @@ export const monitorcontainerRoute = (app) => {
 	app.get('/reloadnginx',reloadNginx);
 	app.post('/createnginx',createNginx_API);
 	app.post('/updatenginx',updateNginx_API);
-	app.post('/rebuildcontainer',rebuildContainer)
+	app.post('/rebuildcontainer',decodeToken,rebuildContainer)
 };

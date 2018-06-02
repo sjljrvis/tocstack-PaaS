@@ -56,6 +56,8 @@ export const reloadNginx = (req,res) => {
 export const rebuildContainer = (req,res) => {
   let PORT;
   const { repositoryName,projectPath } = req.body
+  const { id } = req.JWTData;
+
   portfinder.getPort((err,port) => {
     PORT = port;
     let nginx = ` server {
@@ -78,6 +80,7 @@ export const rebuildContainer = (req,res) => {
 
     task.stdout.on('data',(data) => {
       console.log(data.toString('utf-8'))
+      userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
     })
 
     task.on('exit',function () {
@@ -86,7 +89,10 @@ export const rebuildContainer = (req,res) => {
         if (err) {
           console.log(err)
         }
-        else console.log(data)
+        else {
+          console.log(data)
+          res.json({ status: true,message: 'success' })
+        }
       })
     });
 
@@ -104,7 +110,7 @@ const updateNginx = (repositoryName,nginx,callback) => {
       if (err) throw new Error("sudo service nginx reload")
       else {
         exec("sudo service nginx reload",(err,stdout,stderr) => {
-          callback(null,"app deployed")
+          callback(null,"App deployed to tocstack")
         });
       }
     });
