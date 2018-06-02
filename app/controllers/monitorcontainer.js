@@ -76,6 +76,7 @@ export const rebuildContainer = (req,res) => {
 
     task.stderr.on('data',(err) => {
       console.log(err.toString())
+      userSocket[id].send(JSON.stringify({ message: err.toString(),type: "logs" }))
     })
 
     task.stdout.on('data',(data) => {
@@ -85,12 +86,15 @@ export const rebuildContainer = (req,res) => {
 
     task.on('exit',function () {
       console.log(`Checkout your app ${repositoryName}.tocstack.com`);
+      userSocket[id].send(JSON.stringify({ message: `Checkout your app ${repositoryName}.tocstack.com`,type: "logs" }))
+
       updateNginx(repositoryName,nginx,(err,data) => {
         if (err) {
           console.log(err)
         }
         else {
           console.log(data)
+          userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
           res.json({ status: true,message: 'success' })
         }
       })
