@@ -70,7 +70,8 @@ export const rebuildContainer = (req,res) => {
      }
     }`;
 
-    const task = spawn("sh",[`${shellScriptPath}/updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
+    console.log(`${projectPath}_docker`);
+    const task = spawn("sh",[`updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
 
     task.stderr.on('data',(err) => {
       console.log(err.toString())
@@ -83,13 +84,14 @@ export const rebuildContainer = (req,res) => {
     task.on('exit',function () {
       console.log('App running on port :',PORT)
       console.log(`Checkout your app ${repositoryName}.tocstack.com:${PORT}`);
-      updateNginx(repositoryName,nginx,(err,data) => {
-        if (err) {
-          console.log(err)
-        }
-        else console.log(data)
-      })
+      // updateNginx(repositoryName,nginx,(err,data) => {
+      //   if (err) {
+      //     console.log(err)
+      //   }
+      //   else console.log(data)
+      // })
     });
+
   });
 }
 
