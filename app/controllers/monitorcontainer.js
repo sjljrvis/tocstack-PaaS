@@ -58,6 +58,9 @@ export const rebuildContainer = (req,res) => {
   const { repositoryName,projectPath } = req.body
   const { id } = req.JWTData;
 
+  console.log(req.JWTData);
+  console.log(Object.keys(userSocket));
+
   portfinder.getPort((err,port) => {
     PORT = port;
     let nginx = ` server {
