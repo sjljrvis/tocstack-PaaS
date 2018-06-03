@@ -6,9 +6,7 @@ export const UserSchema = function (app,mongoose) {
 		email: { type: String,unique: true },
 		password: { type: String },
 		confirmPassword: { type: String },
-		phoneNumber: String,
-		firstName: String,
-		lastName: String,
+		fullName: { type: String,default: "" },
 		description: { type: String,default: "" },
 		organization: [],
 		date: {

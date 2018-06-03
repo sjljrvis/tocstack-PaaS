@@ -75,11 +75,13 @@ export const deleteRepository = async (req,res) => {
 		});
 		deleteDigitalOcean(repositoryName,(err,body) => {
 			if (err) log.info({ status: false,message: " Unable to delete record" })
+			log.info(body)
 		})
 	} catch (e) {
 		res.json({ status: 'false',message: e.message })
 	}
 }
+
 
 export const getAllRepositories = async (req,res) => {
 	try {
