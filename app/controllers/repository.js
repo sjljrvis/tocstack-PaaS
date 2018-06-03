@@ -115,7 +115,7 @@ let deleteDigitalOcean = (repositoryName,callback) => {
 		}
 		else {
 			let domainRecords = JSON.parse(body).domain_records;
-			let recordId = domainRecords.filter(x => x.name == "boupon").map((x) => { return x.id })[0];
+			let recordId = domainRecords.filter(x => x.name == repositoryName).map((x) => { return x.id })[0];
 			makeRequestToDigitalOcean("DELETE",repositoryName,recordId,(err,body) => {
 				if (err) {
 					return callback(err,{ status: false,message: "Error in digitalOcean" });
