@@ -10,7 +10,7 @@ export const createRepository = async (req,res) => {
 
 	if (req.JWTData) {
 		let userName = req.JWTData.userName;
-		let userId = req.JWTData.userId;
+		let userId = req.JWTData.id;
 		let repositoryName = req.body.repositoryName;
 		let language = req.body.language || "nodeJS";
 
@@ -35,7 +35,7 @@ export const createRepository = async (req,res) => {
 					language: language
 				}
 				let result = await (req.app.db.models.Repository.create(repositoryData));
-				res.json({ status: 'true',message: 'Repository created successfully' });
+				res.json({ status: true,message: 'Repository created successfully' });
 				updateDigitalocean(repositoryName,(err,result) => {
 					if (err) log.error("DO error",err);
 				});
@@ -44,12 +44,12 @@ export const createRepository = async (req,res) => {
 			console.log(err)
 			if (err.code !== 'EEXIST') res.json({ status: 'false',message: 'Repository already exists please choose another name' })
 			else {
-				res.json({ status: 'false',message: e.message })
+				res.json({ status: false,message: e.message })
 			}
 		}
 	}
 	else {
-		res.status(403).json("invalid Credentials")
+		res.status(403).json({ status: false,message: "invalid Credentials" })
 	}
 }
 

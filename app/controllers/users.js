@@ -15,8 +15,9 @@ const cipher = crypto.createCipher('aes192',hashSecret);
 export const getUserInfo = async (req,res) => {
 	try {
 		let { userName } = req.params;
-		let repository = await (req.app.db.models.Repository.find({ userName: userName }).populate('userId'));
-		res.json({ status: true,data: repository })
+		let repository = await (req.app.db.models.Repository.find({ userName: userName }));
+		let user = await (req.app.db.models.User.findOne({ userName: userName }))
+		res.json({ status: true,data: { user,repository } })
 	}
 	catch (e) {
 		return res.json({ status: false,message: e.message })

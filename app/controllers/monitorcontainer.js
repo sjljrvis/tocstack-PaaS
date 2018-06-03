@@ -93,7 +93,6 @@ export const rebuildContainer = (req,res) => {
           console.log(err)
         }
         else {
-          console.log(data)
           userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
           res.json({ status: true,message: 'success' })
         }

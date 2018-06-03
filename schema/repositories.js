@@ -5,10 +5,6 @@ export const RepositorySchema = function (app,mongoose) {
 
 		repositoryName: String,
 		userName: String,
-		userId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'User'
-		},
 		language: {
 			type: String,
 			default: 'nodeJS'
@@ -23,6 +19,7 @@ export const RepositorySchema = function (app,mongoose) {
 			type: Date,
 			default: Date.now()
 		},
+		description: { type: String,default: "App deployed on tocstack" },
 		isDeployed: { type: Boolean,default: false }
 
 	});
