@@ -41,8 +41,7 @@ export const deleteUser = async (req,res) => {
 
 export const addUser = async (req,res) => {
 	let user = {
-		firstName: req.body.firstName,
-		lastName: req.body.lastName,
+		fullName: req.body.fullName,
 		password: req.body.password,
 		userName: req.body.userName,
 		email: req.body.email,
