@@ -8,12 +8,13 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { port,mongodb } from './config';
+import { port,mongodb,Oauthgrant } from './config';
 import bunyan from 'bunyan';
 import bunyanFormat from 'bunyan-format';
 import http from 'http';
 import webSocket from 'ws';
-
+import Grant from 'grant-express';
+import session from 'express-session';
 /*
 * Logger
 */
@@ -35,6 +36,11 @@ const wss = new webSocket.Server({
 	server
 });
 
+let grant = new Grant(Oauthgrant);
+app.use(session({
+	secret: 'grant'
+}))
+app.use(grant);
 app.use(cors());
 app.use(cookieParser('LOL-my-Secret-dam'));
 app.use(bodyparser.json())

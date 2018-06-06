@@ -98,6 +98,21 @@ export const getAllRepositories = async (req,res) => {
 	}
 }
 
+export const getRepository = async (req,res) => {
+	try {
+		if (!req.JWTData) {
+			throw new Error("Invalid user")
+		} else {
+			let result = await (req.app.db.models.Repository.findOne({ "repositoryName": req.params.repositoryName }));
+			if (result) {
+				res.status(200).json({ status: true,repository: result });
+			}
+		}
+	} catch (e) {
+		res.json({ status: false,message: e.message })
+	}
+}
+
 
 let updateDigitalocean = (repositoryName,callback) => {
 	makeRequestToDigitalOcean("POST",repositoryName,null,(err,body) => {

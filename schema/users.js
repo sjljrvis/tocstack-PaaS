@@ -13,6 +13,10 @@ export const UserSchema = function (app,mongoose) {
 			type: Date,
 			default: Date.now()
 		},
+		github: {
+			userName: { type: String,default: "" },
+			accessToken: { type: String,default: "" },
+		},
 		s3Token: { type: String,default: "" }
 	});
 
