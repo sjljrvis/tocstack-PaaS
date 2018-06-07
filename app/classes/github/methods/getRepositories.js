@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-module.exports = function (token) {
+module.exports = function (userName) {
   return (async () => {
     try {
       let options = {
         method: 'GET',
-        baseURL: this.config.baseURL + '/user?access_token=' + token,
+        baseURL: `${this.config.baseURL}/users/${userName}/repos?per_page=100`,
         headers: {
           Accept: "application/json"
         }

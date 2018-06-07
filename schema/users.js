@@ -14,8 +14,12 @@ export const UserSchema = function (app,mongoose) {
 			default: Date.now()
 		},
 		github: {
-			userName: { type: String,default: "" },
 			accessToken: { type: String,default: "" },
+			id: { type: String,default: "" },
+			login: { type: String,default: "" },
+			nodeId: { type: String,default: "" },
+			url: { type: String,default: "" },
+			avatarUrl: { type: String,default: "" },
 		},
 		s3Token: { type: String,default: "" }
 	});
