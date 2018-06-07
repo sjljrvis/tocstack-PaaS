@@ -72,32 +72,36 @@ export const rebuildContainer = (req,res) => {
      }
     }`;
 
-    const task = spawn("sh",[`updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
+    try {
+      const task = spawn("sh",[`updateContainer.sh`],{ cwd: `${projectPath}_docker`,env: { PORT: `${PORT}` } });
 
-    task.stderr.on('data',(err) => {
-      console.log(err.toString())
-      userSocket[id].send(JSON.stringify({ message: err.toString('utf-8'),type: "logs" }))
-    })
-
-    task.stdout.on('data',(data) => {
-      console.log(data.toString('utf-8'))
-      userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
-    })
-
-    task.on('exit',function () {
-      console.log(`Checkout your app ${repositoryName}.tocstack.com`);
-      userSocket[id].send(JSON.stringify({ message: `Checkout your app ${repositoryName}.tocstack.com`,type: "logs" }))
-
-      updateNginx(repositoryName,nginx,(err,data) => {
-        if (err) {
-          console.log(err)
-        }
-        else {
-          userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
-          res.json({ status: true,message: 'success' })
-        }
+      task.stderr.on('data',(err) => {
+        console.log(err.toString())
+        userSocket[id].send(JSON.stringify({ message: err.toString('utf-8'),type: "logs" }))
       })
-    });
+
+      task.stdout.on('data',(data) => {
+        console.log(data.toString('utf-8'))
+        userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
+      })
+
+      task.on('exit',function () {
+        console.log(`Checkout your app ${repositoryName}.tocstack.com`);
+        userSocket[id].send(JSON.stringify({ message: `Checkout your app ${repositoryName}.tocstack.com`,type: "logs" }))
+        updateNginx(repositoryName,nginx,(err,data) => {
+          if (err) {
+            console.log(err)
+          }
+          else {
+            userSocket[id].send(JSON.stringify({ message: data.toString('utf-8'),type: "logs" }))
+            res.json({ status: true,message: 'success' })
+          }
+        })
+      });
+    } catch (e) {
+      userSocket[id].send(JSON.stringify({ message: `Unable to build app ${repositoryName}.tocstack.com`,type: "logs" }))
+      res.json({ status: false,message: 'Unable to build container' })
+    }
 
   });
 }

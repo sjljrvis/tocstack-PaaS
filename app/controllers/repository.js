@@ -82,6 +82,48 @@ export const deleteRepository = async (req,res) => {
 	}
 }
 
+export const unlinkAppFromGithub = async (req,res) => {
+	let { repositoryName } = req.params;
+	try {
+		if (!req.JWTData) {
+			throw new Error("Invalid user")
+		} else {
+			let _github = {
+				connected: false,
+				repositoryName: "",
+				url: "",
+			}
+			let result = await (req.app.db.models.Repository.findOneAndUpdate({ repositoryName },{ github: _github },{ new: true }));
+			if (result) {
+				res.status(200).json({ status: true,repository: result });
+			}
+		}
+	} catch (e) {
+		res.json({ status: false,message: e.message })
+	}
+}
+
+export const linkAppToGithub = async (req,res) => {
+	let { repositoryName } = req.params;
+	try {
+		if (!req.JWTData) {
+			throw new Error("Invalid user")
+		} else {
+			let _github = {
+				connected: true,
+				repositoryName: req.body.githubRepositoryName,
+				url: req.body.githubRepositoryUrl,
+			}
+			let result = await (req.app.db.models.Repository.findOneAndUpdate({ repositoryName },{ github: _github },{ new: true }));
+			if (result) {
+				res.status(200).json({ status: true,repository: result });
+			}
+		}
+	} catch (e) {
+		console.log(e)
+		res.json({ status: false,message: e.message })
+	}
+}
 
 export const getAllRepositories = async (req,res) => {
 	try {

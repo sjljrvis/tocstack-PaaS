@@ -40,11 +40,23 @@ export const getUserInfo = async (req,res) => {
       id: userInfo.id,
       login: userInfo.login,
       nodeId: userInfo.node_id,
-      url: userInfo.url
+      url: userInfo.url,
+      avatarUrl: userInfo.avatar_url
     }
     res.status(200).json({ status: true,data: { user } });
   } catch (e) {
     console.log(e)
+    res.status(200).json({ status: false,error: e.message });
+  }
+}
+
+
+export const getRepositories = async (req,res) => {
+  try {
+    let github = new Github();
+    let repositories = await (github.getRepositories(req.query.userName))
+    res.status(200).json({ status: true,data: { repositories } });
+  } catch (e) {
     res.status(200).json({ status: false,error: e.message });
   }
 }

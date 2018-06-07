@@ -13,6 +13,11 @@ export const RepositorySchema = function (app,mongoose) {
 			type: String,
 			default: 'kracken'
 		},
+		github: {
+			connected: { type: Boolean,default: false },
+			url: { type: String,default: "" },
+			repositoryName: { type: String,default: "" }
+		},
 		path: String,
 		pathDocker: String,
 		date: {
