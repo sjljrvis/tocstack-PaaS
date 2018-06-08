@@ -1,5 +1,10 @@
 import axios from 'axios'
 
+/**
+ * @param {*} userName
+ * @returns {data} user/repository list
+ */
+
 module.exports = function (userName) {
   return (async () => {
     try {

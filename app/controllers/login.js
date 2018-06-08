@@ -1,6 +1,13 @@
 import { jwtSecret } from '../../config'
+/**
+ *
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns {res} status-200 if login is valid
+ */
 
-export const loginPage = async (req,res) => {
+const loginPage = async (req,res) => {
 	try {
 		if (req.body.email && req.body.password) {
 			let user = await (req.app.db.models.User.findOne({ email: req.body.email }))
@@ -35,8 +42,14 @@ export const loginPage = async (req,res) => {
 }
 
 
-
-export const logout = async (req,res) => {
+/**
+ *
+ *
+ * @param {*} req
+ * @param {*} res
+ * @returns
+ */
+const logout = async (req,res) => {
 	try {
 		let user = await req.app.db.models.User.findOne({ _id: req.JWTData.id });
 		if (user == null) {

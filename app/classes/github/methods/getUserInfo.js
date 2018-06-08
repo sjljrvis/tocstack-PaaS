@@ -1,5 +1,10 @@
 import axios from 'axios'
-
+/**
+ *
+ *
+ * @param {*} token
+ * @returns {data} conists of user info from github
+ */
 module.exports = function (token) {
   return (async () => {
     try {

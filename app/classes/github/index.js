@@ -1,7 +1,9 @@
 
 import fs from 'fs';
 import { Oauthgrant } from '../../../config'
-
+/**
+ * @class Github
+ */
 class Github {
   constructor() {
     this.config = {

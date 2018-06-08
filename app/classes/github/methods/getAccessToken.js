@@ -1,5 +1,13 @@
 import axios from 'axios'
 
+/**
+ *
+ *
+ * @param {*} code
+ * @param {*} state
+ * @returns {data} consists of user access_token and oauthD_data
+ */
+
 module.exports = function (code,state) {
   return (async () => {
     try {
