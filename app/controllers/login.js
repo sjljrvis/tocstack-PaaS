@@ -63,10 +63,7 @@ const logout = async (req,res) => {
 	}
 }
 
-export const permissions = (req,res) => {
-	res.json({ message: req.JWTData.permissions })
-};
 
 
 
-
+module.exports = { loginPage,logout }
