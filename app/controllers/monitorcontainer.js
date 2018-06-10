@@ -15,7 +15,7 @@ export const monitorContainer = (req,res) => {
         {
           State: result[0].State,
           HostConfig: { ShmSize: result[0].HostConfig.ShmSize },
-          NetworkSettings: result[0].NetworkSettings.Networks
+          NetworkSettings: result[0].NetworkSettings.Networks[containerDefault]
         }
       ];
       res.status(200).json({ status: true,info: _result })
