@@ -105,7 +105,7 @@ wss.on('connection',function connection(ws,req) {
 	});
 
 	userSocket[userId].on("close",() => {
-		log.info(`${userSocket[userId][userName]} went offline`)
+		log.info(`user went offline`)
 		delete userSocket[userId]
 	})
 
