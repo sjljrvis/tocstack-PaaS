@@ -92,30 +92,36 @@ export const editUser = async (req,res) => {
 			if (userData.validPassword(req.body.oldPassword)) {
 				let SALT_FACTOR = 5;
 				req.app.bcrypt.genSalt(SALT_FACTOR,(err,salt) => {
-					if (err) throw new Error(err)
+					if (err) { throw new Error(err) }
 					else {
 						req.app.bcrypt.hash(req.body.password,salt,(err,hash) => {
-							if (err) throw new Error(err)
-							let encrypted = cipher.update(JSON.stringify({ userName: user.userName + Date.now() }),'utf8','hex');
-							encrypted += cipher.final('hex');
-							userData.s3Token = encrypted;
-							userData.password = hash;
-							userData.confirmPassword = hash;
-							userData.save();
-							res.json({ status: true,message: "Password updated" });
+							if (err) { throw new Error(err) }
+							else {
+								let encrypted = cipher.update(JSON.stringify({ userName: userData.userName + Date.now() }),'utf8','hex');
+								encrypted += cipher.final('hex');
+								user.$set.s3Token = encrypted;
+								user.$set.password = hash;
+								user.$set.confirmPassword = hash;
+								req.app.db.models.User.findByIdAndUpdate(userData._id,user,(err,updatedData) => {
+									if (err) { throw new Error(err) }
+									else {
+										res.json({ status: true,message: "Password updated" });
+									}
+								})
+							}
 						});
 					}
 				})
-				let passwordData = `${req.body.userName}:${md5(req.body.password)}`
-				fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(err) => {
-					if (err) throw new Error(err)
-					exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
-						if (err) throw new Error(err)
-						else {
-							log.info({ status: true,message: "Password file updated" })
-						}
-					})
-				})
+				// let passwordData = `${req.body.userName}:${md5(req.body.password)}`
+				// fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(err) => {
+				// 	if (err) throw new Error(err)
+				// 	exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
+				// 		if (err) throw new Error(err)
+				// 		else {
+				// 			log.info({ status: true,message: "Password file updated" })
+				// 		}
+				// 	})
+				// })
 			} else {
 				throw new Error("Old password is incorrect")
 			}
@@ -175,3 +181,5 @@ export const shows3Token = async (req,res) => {
 		return res.json({ status: false,message: e.message,s3Token: "" })
 	}
 }
+//$2a$05$TQnKErftQ/sezFTe7ZbVbuAOOSx4nlxBtF6ZhRjh31K/EGHOu/9QC
+//$2a$05$bt6Jp9DdCttPrYFTQzRHWux1AcCCPbo6017ZsMed7FQsll8Ppeoly

@@ -49,6 +49,7 @@ export const UserSchema = function (app,mongoose) {
 				}
 				else {
 					user.password = hash;
+					console.log("updating hash")
 					next();
 				}
 			});
