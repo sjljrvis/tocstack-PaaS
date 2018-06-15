@@ -112,16 +112,16 @@ export const editUser = async (req,res) => {
 						});
 					}
 				})
-				// let passwordData = `${req.body.userName}:${md5(req.body.password)}`
-				// fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(err) => {
-				// 	if (err) throw new Error(err)
-				// 	exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
-				// 		if (err) throw new Error(err)
-				// 		else {
-				// 			log.info({ status: true,message: "Password file updated" })
-				// 		}
-				// 	})
-				// })
+				let passwordData = `${req.body.userName}:${md5(req.body.password)}`
+				fs.writeFile(`${rootDirectory + req.body.userName}/htpasswd`,passwordData,(err) => {
+					if (err) throw new Error(err)
+					exec(`sudo chown www-data ${rootDirectory + req.body.userName}/htpasswd && sudo service nginx reload`,(err,stdout,stderr) => {
+						if (err) throw new Error(err)
+						else {
+							log.info({ status: true,message: "Password file updated" })
+						}
+					})
+				})
 			} else {
 				throw new Error("Old password is incorrect")
 			}
