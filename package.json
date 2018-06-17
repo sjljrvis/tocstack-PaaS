@@ -40,8 +40,10 @@
     "jsonwebtoken": "^7.4.2",
     "mocha": "^5.1.1",
     "mongoose": "^4.11.7",
+    "nodegit": "^0.22.1",
     "portfinder": "^1.0.13",
     "request": "^2.83.0",
+    "rmdir": "^1.2.0",
     "ws": "^5.2.0"
   },
   "devDependencies": {}

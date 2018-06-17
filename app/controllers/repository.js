@@ -1,9 +1,10 @@
-const fs = require('fs')
-const { exec,execSync } = require('child_process');
+import fs from 'fs'
+import { exec,execSync } from 'child_process';
 import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
 import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
 import request from 'request'
+import rmdir from 'rmdir'
 
 
 export const createRepository = async (req,res) => {
@@ -52,10 +53,6 @@ export const createRepository = async (req,res) => {
 		res.status(403).json({ status: false,message: "invalid Credentials" })
 	}
 }
-
-
-
-
 export const deleteRepository = async (req,res) => {
 	try {
 		if (!req.JWTData) throw new Error("Invalid Credentials");
@@ -81,7 +78,6 @@ export const deleteRepository = async (req,res) => {
 		res.json({ status: 'false',message: e.message })
 	}
 }
-
 export const unlinkAppFromGithub = async (req,res) => {
 	let { repositoryName } = req.params;
 	try {
@@ -102,7 +98,6 @@ export const unlinkAppFromGithub = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
-
 export const linkAppToGithub = async (req,res) => {
 	let { repositoryName } = req.params;
 	try {
@@ -124,7 +119,6 @@ export const linkAppToGithub = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
-
 export const getAllRepositories = async (req,res) => {
 	try {
 		if (!req.JWTData) {
@@ -139,7 +133,6 @@ export const getAllRepositories = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
-
 export const getRepository = async (req,res) => {
 	try {
 		if (!req.JWTData) {
@@ -152,6 +145,59 @@ export const getRepository = async (req,res) => {
 		}
 	} catch (e) {
 		res.json({ status: false,message: e.message })
+	}
+}
+export const buildGitHubRepository = async (req,res) => {
+	try {
+		if (!req.JWTData) {
+			throw new Error("Invalid user")
+		} else {
+			let repository = await (req.app.db.models.Repository.findOne({ "repositoryName": req.params.repositoryName }));
+			if (repository) {
+				let repositoryVerification = verifyRepositoryPath(repository)
+				switch (repositoryVerification.action) {
+					case "clone":
+						if (!repositoryVerification.oldRepo) {
+							log.info("cloning repository .....",repository.github.url)
+							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+							log.info("cloning repository .....done")
+						}
+						else {
+							log.info("Cleaning directory....",)
+							rmdir(`${repositoryVerification.basePath}/${repositoryVerification.oldRepo}`)
+							log.info("Cleaning directory....done",)
+							log.info("cloning repository .....",repository.github.url)
+							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+						}
+
+						break;
+					case "pull": log.info("pulling latest commit .....",repository.github.url)
+						break;
+				}
+				res.status(200).json({ status: true,repository: repository,repositoryVerification });
+			}
+		}
+	} catch (e) {
+		res.json({ status: false,message: e.message })
+	}
+}
+/*
+* SHOULD BE IN PROPER FOLDER STRUCTURE
+*/
+// GITHUB helpers
+
+const verifyRepositoryPath = (repository) => {
+	try {
+		let path = fs.readdirSync(`${__base}/test/${repository.repositoryName}`);
+		return {
+			basePath: `${__base}/test/${repository.repositoryName}`,
+			oldRepo: path[0] || null,
+			newRepo: repository.github.repositoryName,
+			action: path == repository.github.repositoryName ? "pull" : "clone"
+		}
+	} catch (e) {
+		log.error(e.message)
+		throw new Error("Repository not found,Build from github failed")
 	}
 }
 

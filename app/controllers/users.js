@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import md5 from 'apache-md5';
 import { exec } from 'child_process';
 import { rootDirectory } from '../helper/constant';
-import { execshell } from '../helper/functions';
 import { hashSecret } from '../../config';
 
 const cipher = crypto.createCipher('aes192',hashSecret);
@@ -57,14 +56,14 @@ export const addUser = async (req,res) => {
 		if (data) throw new Error("Duplicate Email Address");
 		data = await (req.app.db.models.User.create(user));
 		exec(`sudo -u www-data mkdir ${rootDirectory + data.userName} && chown www-data:www-data -R ${rootDirectory + data.userName}`,(err,stdout,stderr) => {
-			if (err) throw new Error(err);
+			if (err) { throw new Error(err); }
 			else {
 				let passwordData = `${req.body.userName}:${md5(req.body.password)}`;
 				fs.writeFile(`${rootDirectory + data.userName}/htpasswd`,passwordData,(err) => {
-					if (err) throw new Error(err);
+					if (err) { throw new Error(err); }
 					else {
 						exec(`sudo service nginx reload`,(err,stdout,stderr) => {
-							if (err) throw new Error(err);
+							if (err) { throw new Error(err); }
 							res.json({ status: true,message: "Register successful" });
 						});
 					};
