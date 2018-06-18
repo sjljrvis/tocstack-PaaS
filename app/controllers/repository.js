@@ -1,10 +1,10 @@
 import fs from 'fs'
 import { exec,execSync } from 'child_process';
-import { execshell } from '../helper/functions'
 import { rootDirectory } from '../helper/constant'
 import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
 import request from 'request'
 import rmdir from 'rmdir'
+import Git from 'nodegit'
 
 
 export const createRepository = async (req,res) => {
@@ -156,11 +156,15 @@ export const buildGitHubRepository = async (req,res) => {
 			if (repository) {
 				let repositoryVerification = verifyRepositoryPath(repository)
 				switch (repositoryVerification.action) {
+
 					case "clone":
 						if (!repositoryVerification.oldRepo) {
 							log.info("cloning repository .....",repository.github.url)
 							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-							log.info("cloning repository .....done")
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+								.then(function (repo) {
+									log.info("cloning repository .....done")
+								}).catch(function (err) { console.log(err); });
 						}
 						else {
 							log.info("Cleaning directory....",)
@@ -168,16 +172,36 @@ export const buildGitHubRepository = async (req,res) => {
 							log.info("Cleaning directory....done",)
 							log.info("cloning repository .....",repository.github.url)
 							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+								.then(function (repo) {
+									log.info("cloning repository .....done")
+								}).catch(function (err) { console.log(err); });
 						}
+						break;
+
+
+					case "pull":
+						log.info("pulling latest commit .....",repository.github.url)
+						log.info("Cleaning directory....",)
+						rmdir(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`,(err,dirs,files) => {
+							log.info("Cleaning directory....done",)
+							log.info(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+								.then(function (repo) {
+									log.info("pulling latest commit .....done")
+								}).catch(function (err) { console.log(err); });
+						})
 
 						break;
-					case "pull": log.info("pulling latest commit .....",repository.github.url)
-						break;
+
+					default: log.info("Invalid action found .....")
 				}
 				res.status(200).json({ status: true,repository: repository,repositoryVerification });
 			}
 		}
 	} catch (e) {
+		console.log(e)
 		res.json({ status: false,message: e.message })
 	}
 }
@@ -190,7 +214,7 @@ const verifyRepositoryPath = (repository) => {
 	try {
 		let path = fs.readdirSync(`${__base}/test/${repository.repositoryName}`);
 		return {
-			basePath: `${__base}/test/${repository.repositoryName}`,
+			basePath: `${__base}/test/${repository.repositoryName}`, // Change this path based on PROD_ENV !
 			oldRepo: path[0] || null,
 			newRepo: repository.github.repositoryName,
 			action: path == repository.github.repositoryName ? "pull" : "clone"
