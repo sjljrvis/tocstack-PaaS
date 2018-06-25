@@ -66,9 +66,9 @@ export const addUser = async (req,res) => {
 							if (err) { throw new Error(err); }
 							res.json({ status: true,message: "Register successful" });
 						});
-					};
+					}
 				});
-			};
+			}
 		});
 	}
 	catch (e) {
@@ -180,5 +180,3 @@ export const shows3Token = async (req,res) => {
 		return res.json({ status: false,message: e.message,s3Token: "" })
 	}
 }
-//$2a$05$TQnKErftQ/sezFTe7ZbVbuAOOSx4nlxBtF6ZhRjh31K/EGHOu/9QC
-//$2a$05$bt6Jp9DdCttPrYFTQzRHWux1AcCCPbo6017ZsMed7FQsll8Ppeoly

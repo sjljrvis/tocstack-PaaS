@@ -40,7 +40,7 @@ export const createRepository = async (req,res) => {
 				updateDigitalocean(repositoryName,(err,result) => {
 					if (err) log.error("DO error",err);
 				});
-			};
+			}
 		} catch (err) {
 			console.log(err)
 			if (err.code !== 'EEXIST') res.json({ status: 'false',message: 'Repository already exists please choose another name' })
@@ -162,9 +162,12 @@ export const buildGitHubRepository = async (req,res) => {
 							log.info("cloning repository .....",repository.github.url)
 							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
 							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-								.then(function (repo) {
+								.then((repo) => {
 									log.info("cloning repository .....done")
-								}).catch(function (err) { console.log(err); });
+									buildProject();
+								}).catch((err) => {
+									log.error(err)
+								});
 						}
 						else {
 							log.info("Cleaning directory....",)
@@ -173,9 +176,11 @@ export const buildGitHubRepository = async (req,res) => {
 							log.info("cloning repository .....",repository.github.url)
 							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
 							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-								.then(function (repo) {
+								.then((repo) => {
 									log.info("cloning repository .....done")
-								}).catch(function (err) { console.log(err); });
+								}).catch((err) => {
+									log.error(err)
+								});
 						}
 						break;
 
@@ -188,9 +193,11 @@ export const buildGitHubRepository = async (req,res) => {
 							log.info(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
 							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
 							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-								.then(function (repo) {
+								.then((repo) => {
 									log.info("pulling latest commit .....done")
-								}).catch(function (err) { console.log(err); });
+								}).catch((err) => {
+									log.error(err)
+								});
 						})
 
 						break;
