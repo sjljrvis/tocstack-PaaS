@@ -1,6 +1,7 @@
-import fs from 'fs'
+import fs,{ rmdirSync } from 'fs'
 import { exec,execSync } from 'child_process';
 import { rootDirectory } from '../helper/constant'
+import { buildProjectGithub } from '../../scripts/github'
 import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
 import request from 'request'
 import rmdir from 'rmdir'
@@ -155,32 +156,35 @@ export const buildGitHubRepository = async (req,res) => {
 			let repository = await (req.app.db.models.Repository.findOne({ "repositoryName": req.params.repositoryName }));
 			if (repository) {
 				let repositoryVerification = verifyRepositoryPath(repository)
+				console.log(repositoryVerification)
+
 				switch (repositoryVerification.action) {
 
 					case "clone":
 						if (!repositoryVerification.oldRepo) {
 							log.info("cloning repository .....",repository.github.url)
-							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+							fs.mkdirSync(`${repositoryVerification.basePath}/${repository.repositoryName}`)
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
 								.then((repo) => {
 									log.info("cloning repository .....done")
-									buildProject();
+									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo)
 								}).catch((err) => {
 									log.error(err)
 								});
 						}
 						else {
 							log.info("Cleaning directory....",)
-							rmdir(`${repositoryVerification.basePath}/${repositoryVerification.oldRepo}`)
 							log.info("Cleaning directory....done",)
 							log.info("cloning repository .....",repository.github.url)
-							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-								.then((repo) => {
-									log.info("cloning repository .....done")
-								}).catch((err) => {
-									log.error(err)
-								});
+							rmdir(`${repositoryVerification.basePath}`,(err) => {
+								Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
+									.then((repo) => {
+										log.info("cloning repository .....done")
+										buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo)
+									}).catch((err) => {
+										log.error(err)
+									});
+							});
 						}
 						break;
 
@@ -188,13 +192,12 @@ export const buildGitHubRepository = async (req,res) => {
 					case "pull":
 						log.info("pulling latest commit .....",repository.github.url)
 						log.info("Cleaning directory....",)
-						rmdir(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`,(err,dirs,files) => {
-							log.info("Cleaning directory....done",)
-							log.info(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-							fs.mkdirSync(`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
-							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repositoryVerification.newRepo}`)
+						log.info("Cleaning directory....done",)
+						rmdir(`${repositoryVerification.basePath}`,(err) => {
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
 								.then((repo) => {
-									log.info("pulling latest commit .....done")
+									log.info("pulling latest commit .....done",repo)
+									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo)
 								}).catch((err) => {
 									log.error(err)
 								});
@@ -218,19 +221,24 @@ export const buildGitHubRepository = async (req,res) => {
 // GITHUB helpers
 
 const verifyRepositoryPath = (repository) => {
+
+	if (!fs.existsSync(`${__base}/test/${repository.repositoryName}_github`)) {
+		fs.mkdirSync(`${__base}/test/${repository.repositoryName}_github`)
+	}
 	try {
-		let path = fs.readdirSync(`${__base}/test/${repository.repositoryName}`);
+		let path = fs.readdirSync(`${__base}/test/${repository.repositoryName}_github`);
+		path = path.filter(file => !file.startsWith('.'))
 		return {
-			basePath: `${__base}/test/${repository.repositoryName}`, // Change this path based on PROD_ENV !
+			basePath: `${__base}/test/${repository.repositoryName}_github`, // Change this path based on PROD_ENV !
 			oldRepo: path[0] || null,
 			newRepo: repository.github.repositoryName,
-			action: path == repository.github.repositoryName ? "pull" : "clone"
+			action: path[0] ? "pull" : "clone"
 		}
 	} catch (e) {
-		log.error(e.message)
 		throw new Error("Repository not found,Build from github failed")
 	}
 }
+
 
 
 let updateDigitalocean = (repositoryName,callback) => {
