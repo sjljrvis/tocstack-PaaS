@@ -164,8 +164,8 @@ export const buildGitHubRepository = async (req,res) => {
 					case "clone":
 						if (!repositoryVerification.oldRepo) {
 							log.info("cloning repository .....",repository.github.url)
-							fs.mkdirSync(`${repositoryVerification.basePath}/${repository.repositoryName}`)
-							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
+							fs.mkdirSync(`${repositoryVerification.basePath}${repository.repositoryName}`)
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}${repository.repositoryName}`)
 								.then((repo) => {
 									log.info("cloning repository .....done")
 									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo,userName)
@@ -178,7 +178,7 @@ export const buildGitHubRepository = async (req,res) => {
 							log.info("Cleaning directory....done",)
 							log.info("cloning repository .....",repository.github.url)
 							rmdir(`${repositoryVerification.basePath}`,(err) => {
-								Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
+								Git.Clone(repository.github.url,`${repositoryVerification.basePath}${repository.repositoryName}`)
 									.then((repo) => {
 										log.info("cloning repository .....done")
 										buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo,userName)
@@ -195,7 +195,7 @@ export const buildGitHubRepository = async (req,res) => {
 						log.info("Cleaning directory....",)
 						log.info("Cleaning directory....done",)
 						rmdir(`${repositoryVerification.basePath}`,(err) => {
-							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
+							Git.Clone(repository.github.url,`${repositoryVerification.basePath}${repository.repositoryName}`)
 								.then((repo) => {
 									log.info("pulling latest commit .....done",repo)
 									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo,userName)
@@ -223,14 +223,14 @@ export const buildGitHubRepository = async (req,res) => {
 
 const verifyRepositoryPath = (repository,userName) => {
 
-	if (!fs.existsSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`)) {
+	if (!fs.existsSync(`${serverRootDirectory}${userName}/${repository.repositoryName}_github`)) {
 		fs.mkdirSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`)
 	}
 	try {
-		let path = fs.readdirSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`);
+		let path = fs.readdirSync(`${serverRootDirectory}${userName}/${repository.repositoryName}_github`);
 		path = path.filter(file => !file.startsWith('.'))
 		return {
-			basePath: `${serverRootDirectory}/${userName}/${repository.repositoryName}_github`, // Change this path based on PROD_ENV !
+			basePath: `${serverRootDirectory}${userName}/${repository.repositoryName}_github`, // Change this path based on PROD_ENV !
 			oldRepo: path[0] || null,
 			newRepo: repository.github.repositoryName,
 			action: path[0] ? "pull" : "clone"
