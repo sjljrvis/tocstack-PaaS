@@ -168,7 +168,7 @@ export const buildGitHubRepository = async (req,res) => {
 							Git.Clone(repository.github.url,`${repositoryVerification.basePath}/${repository.repositoryName}`)
 								.then((repo) => {
 									log.info("cloning repository .....done")
-									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo)
+									buildProjectGithub(req.params.repositoryName,repositoryVerification.newRepo,userName)
 								}).catch((err) => {
 									log.error(err)
 								});
