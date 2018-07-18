@@ -2,7 +2,7 @@ import fs,{ rmdirSync } from 'fs'
 import { exec,execSync } from 'child_process';
 import { rootDirectory } from '../helper/constant'
 import { buildProjectGithub } from '../../scripts/github'
-import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED } from '../../config'
+import { callDockerPath,shellScriptPath,token,NGINX_DIRECTORY,NGINX_SITES_ENABLED,serverRootDirectory } from '../../config'
 import request from 'request'
 import rmdir from 'rmdir'
 import Git from 'nodegit'
@@ -153,9 +153,10 @@ export const buildGitHubRepository = async (req,res) => {
 		if (!req.JWTData) {
 			throw new Error("Invalid user")
 		} else {
+			let { userName } = req.JWTData;
 			let repository = await (req.app.db.models.Repository.findOne({ "repositoryName": req.params.repositoryName }));
 			if (repository) {
-				let repositoryVerification = verifyRepositoryPath(repository)
+				let repositoryVerification = verifyRepositoryPath(repository,userName)
 				console.log(repositoryVerification)
 
 				switch (repositoryVerification.action) {
@@ -220,16 +221,16 @@ export const buildGitHubRepository = async (req,res) => {
 */
 // GITHUB helpers
 
-const verifyRepositoryPath = (repository) => {
+const verifyRepositoryPath = (repository,userName) => {
 
-	if (!fs.existsSync(`${__base}/test/${repository.repositoryName}_github`)) {
-		fs.mkdirSync(`${__base}/test/${repository.repositoryName}_github`)
+	if (!fs.existsSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`)) {
+		fs.mkdirSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`)
 	}
 	try {
-		let path = fs.readdirSync(`${__base}/test/${repository.repositoryName}_github`);
+		let path = fs.readdirSync(`${serverRootDirectory}/${userName}/${repository.repositoryName}_github`);
 		path = path.filter(file => !file.startsWith('.'))
 		return {
-			basePath: `${__base}/test/${repository.repositoryName}_github`, // Change this path based on PROD_ENV !
+			basePath: `${serverRootDirectory}/${userName}/${repository.repositoryName}_github`, // Change this path based on PROD_ENV !
 			oldRepo: path[0] || null,
 			newRepo: repository.github.repositoryName,
 			action: path[0] ? "pull" : "clone"
