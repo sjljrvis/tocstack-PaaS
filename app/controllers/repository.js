@@ -54,6 +54,8 @@ export const createRepository = async (req,res) => {
 		res.status(403).json({ status: false,message: "invalid Credentials" })
 	}
 }
+
+
 export const deleteRepository = async (req,res) => {
 	try {
 		if (!req.JWTData) throw new Error("Invalid Credentials");
@@ -79,6 +81,8 @@ export const deleteRepository = async (req,res) => {
 		res.json({ status: 'false',message: e.message })
 	}
 }
+
+
 export const unlinkAppFromGithub = async (req,res) => {
 	let { repositoryName } = req.params;
 	try {
@@ -99,6 +103,8 @@ export const unlinkAppFromGithub = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
+
+
 export const linkAppToGithub = async (req,res) => {
 	let { repositoryName } = req.params;
 	try {
@@ -120,6 +126,8 @@ export const linkAppToGithub = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
+
+
 export const getAllRepositories = async (req,res) => {
 	try {
 		if (!req.JWTData) {
@@ -134,6 +142,8 @@ export const getAllRepositories = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
+
+
 export const getRepository = async (req,res) => {
 	try {
 		if (!req.JWTData) {
@@ -148,6 +158,8 @@ export const getRepository = async (req,res) => {
 		res.json({ status: false,message: e.message })
 	}
 }
+
+
 export const buildGitHubRepository = async (req,res) => {
 	try {
 		if (!req.JWTData) {
