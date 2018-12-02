@@ -63,7 +63,7 @@ export const rebuildContainer = async (req, res) => {
   const { repositoryName, projectPath } = req.body
   const { id } = req.JWTData;
 
-  req.app.db.models.Repository.find({ repositoryName })
+  req.app.db.models.Repository.findOne({ repositoryName })
     .then((repositoryData) => {
       if(repositoryData.github.connected){
           stopContainer(`${repositoryName}_web_1`)
@@ -120,6 +120,7 @@ export const rebuildContainer = async (req, res) => {
     }
 
   });
+
 }
 
 
