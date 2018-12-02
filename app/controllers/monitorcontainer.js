@@ -52,14 +52,27 @@ export const reloadNginx = (req, res) => {
   });
 };
 
+export const stopContainer = (containerName) =>{
+  exec(`docker stop ${containerName} && docker rm ${containerName}` , (err,stdout,stderr) =>{
+    log.info(stdout)
+  })
+}
 
 export const rebuildContainer = async (req, res) => {
   let PORT;
   const { repositoryName, projectPath } = req.body
   const { id } = req.JWTData;
 
-  let repositoryData = await (req.app.db.models.Repository.find({ repositoryName }))
-  console.log(repositoryData)
+  req.app.db.models.Repository.find({ repositoryName })
+    .then((repositoryData) => {
+      if(repositoryData.github.connected){
+          stopContainer(`${repositoryName}_web_1`)
+      }
+    })
+    .catch(e =>{
+      log.error(e)
+    })
+
 
   portfinder.getPort((err, port) => {
     PORT = port;
